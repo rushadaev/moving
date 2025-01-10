@@ -4,7 +4,7 @@
         class="mobile-top">
       <LeftButton v-show="isLeftButton"/>
       <div class="wrapper">
-        <n-text class="font-inter" strong >{{ title }}</n-text>
+        {{ title }}
       </div>
       <RightButton v-show="isRightButton"/>
     </div>
@@ -45,7 +45,8 @@ header {
   width: 100%;
   padding: 5px 4px;
   height: 50px;
-  background: var(--vt-c-white);
+  background: var(--color-background-mute);
+  color: var(--color-text);
   border-radius: 10px;
   margin: 0 auto;
 }

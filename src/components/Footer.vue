@@ -49,10 +49,10 @@ const themeOverrides = {
     borderRadius: '10px', // Optional: Custom border radius
     fontSizeLarge: '12px', // Optional: Adjust font size
 
-    textColor: '#222222',
+    textColor: 'var(--color-text)', // Default text color
 
     // Background styles
-    color: '#FFFFFF', // Default background color
+    color: 'var(--color-background-soft)', // Default background color
     colorHover: '#5D87EE10', // Background color on hover
     colorPressed: '#3D5FBB10', // Background color when pressed
     colorFocus: '#5D87EE10', // Background color when focused
@@ -105,7 +105,7 @@ footer {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background: var(--vt-c-white);
+  background: var(--color-background-soft);
   border-radius: 10px;
   overflow: hidden;
   margin: 0 auto;

@@ -1,5 +1,5 @@
 <template>
-  <div class="details">
+  <div class="details p-[5px">
     <h1>This is details page</h1>
   </div>
 </template>

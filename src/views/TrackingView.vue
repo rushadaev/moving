@@ -1,5 +1,5 @@
 <template>
-  <div class="tracking">
+  <div class="tracking p-[5px">
     <h1>This is tracking page</h1>
   </div>
 </template>
