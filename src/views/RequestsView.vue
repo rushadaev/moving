@@ -3,8 +3,8 @@ import RequestsList from '../components/RequestsList.vue'
 </script>
 
 <template>
-  <main class="p-[5px]">
-    <RequestsList />
+  <main class="p-[5px] w-full">
+    <RequestsList/>
   </main>
 </template>
 
