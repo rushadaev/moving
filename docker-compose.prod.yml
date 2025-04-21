@@ -33,6 +33,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
       - ./.env:/var/www/html/.env
     environment:
       - APP_NAME=${APP_NAME}
@@ -71,4 +72,5 @@ networks:
 
 volumes:
   mysql_data:
-  frontend_dist: 
+  frontend_dist:
+  backend_vendor: 
