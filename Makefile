@@ -1,4 +1,4 @@
-.PHONY: up-dev down-dev build-dev rebuild-dev up-prod down-prod build-prod rebuild-prod restart logs frontend backend mysql
+.PHONY: up-dev down-dev build-dev rebuild-dev up-prod down-prod build-prod rebuild-prod restart logs frontend backend mysql clear-cache-dev clear-cache-prod
 
 # Development commands
 up-dev:
@@ -15,6 +15,13 @@ rebuild-dev:
 	docker-compose -f docker-compose.dev.yml build --no-cache
 	docker-compose -f docker-compose.dev.yml up -d
 
+clear-cache-dev:
+	docker-compose -f docker-compose.dev.yml exec backend php artisan cache:clear
+	docker-compose -f docker-compose.dev.yml exec backend php artisan config:clear
+	docker-compose -f docker-compose.dev.yml exec backend php artisan route:clear
+	docker-compose -f docker-compose.dev.yml exec backend php artisan view:clear
+	docker-compose -f docker-compose.dev.yml exec backend composer dump-autoload
+
 # Production commands
 up-prod:
 	docker-compose -f docker-compose.prod.yml up -d
@@ -29,6 +36,16 @@ rebuild-prod:
 	docker-compose -f docker-compose.prod.yml down
 	docker-compose -f docker-compose.prod.yml build --no-cache
 	docker-compose -f docker-compose.prod.yml up -d
+
+clear-cache-prod:
+	docker-compose -f docker-compose.prod.yml exec backend php artisan cache:clear
+	docker-compose -f docker-compose.prod.yml exec backend php artisan config:clear
+	docker-compose -f docker-compose.prod.yml exec backend php artisan route:clear
+	docker-compose -f docker-compose.prod.yml exec backend php artisan view:clear
+	docker-compose -f docker-compose.prod.yml exec backend composer dump-autoload
+	docker-compose -f docker-compose.prod.yml exec backend php artisan config:cache
+	docker-compose -f docker-compose.prod.yml exec backend php artisan route:cache
+	docker-compose -f docker-compose.prod.yml exec backend php artisan view:cache
 
 # Common commands
 restart:
