@@ -19,6 +19,16 @@ const router = createRouter({
       name: 'tracking',
       component: () => import('../views/TrackingView.vue'),
     },
+    {
+      path: '/route',
+      name: 'route',
+      component: () => import('../views/RouteView.vue'),
+    },
+    {
+      path: '/company',
+      name: 'company',
+      component: () => import('../views/CompanyView.vue'),
+    },
   ],
 })
 

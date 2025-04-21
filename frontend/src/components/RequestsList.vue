@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import RequestItem from './RequestItem.vue'
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const items = [
   {
@@ -35,17 +38,28 @@ const items = [
     unloadingAddress: "202 Cedar St, City H",
   },
 ]
+
+// Navigate to details view when a request is clicked
+const showRequestDetails = (item) => {
+  // Store the selected request in localStorage to access it on the details page
+  localStorage.setItem('selectedRequest', JSON.stringify(item));
+  router.push('/details');
+};
 </script>
 
 <template>
-  <div
-      class="grid gap-5 w-full justify-center items-center grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    <RequestItem
-      v-for="item in items"
-  :key="item.requestNumber"
-  :item="item"
-  >
-  Request
-  </RequestItem>
+  <div class="w-full">
+    <h1 class="text-2xl font-bold mb-4 ml-2">Requests</h1>
+    <div class="grid gap-5 w-full justify-center items-center grid-cols-1">
+      <RequestItem
+        v-for="item in items"
+        :key="item.requestNumber"
+        :item="item"
+        @click="showRequestDetails(item)"
+        class="cursor-pointer"
+      >
+        Request
+      </RequestItem>
+    </div>
   </div>
 </template>
