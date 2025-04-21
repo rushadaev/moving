@@ -13,8 +13,8 @@
 import { defineProps } from 'vue';
 import { NButton } from 'naive-ui';
 import type { PropType } from 'vue';
-import type { Size } from 'naive-ui'; // Import the Size type from Naive UI
 
+type Size = 'tiny' | 'small' | 'medium' | 'large';
 
 defineProps({
   circle: {
@@ -30,7 +30,7 @@ defineProps({
     default: 'default'
   },
   size: {
-    type: String as PropType<Size>, // Use PropType<Size> for stricter typing
+    type: String as PropType<Size>,
     default: 'medium'
   },
   disabled: {

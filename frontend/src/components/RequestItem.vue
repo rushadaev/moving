@@ -62,8 +62,17 @@
 </template>
 
 <script setup lang="ts">
+interface RequestItem {
+  requestNumber: string;
+  price: string | number;
+  type: string;
+  time: string;
+  loadingAddress: string;
+  unloadingAddress: string;
+}
+
 defineProps<{
-  item: object
+  item: RequestItem
 }>()
 </script>
 
