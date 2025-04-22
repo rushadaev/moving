@@ -103,7 +103,7 @@ footer {
 
 .mobile-navigation {
   width: 100%;
-  background: white;
+  background: var(--color-background-soft);
 }
 
 .full-width-button-group {
@@ -126,5 +126,6 @@ footer {
   font-weight: 500;
   font-size: 12px;
   line-height: 15px;
+  color: var(--color-text);
 }
 </style>

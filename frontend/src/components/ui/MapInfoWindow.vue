@@ -34,7 +34,7 @@ defineEmits(['close']);
 
 <style scoped>
 .info-window {
-  background: white;
+  background: var(--color-background);
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
   width: 100%;
@@ -48,21 +48,21 @@ defineEmits(['close']);
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border, #eee);
 }
 
 .info-window-title {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
 }
 
 .close-button {
   background: none;
   border: none;
   cursor: pointer;
-  color: #666;
+  color: var(--color-text-secondary, #666);
   padding: 4px;
   display: flex;
   align-items: center;
@@ -71,11 +71,12 @@ defineEmits(['close']);
 }
 
 .close-button:hover {
-  background-color: #f5f5f5;
+  background-color: var(--color-background-mute);
 }
 
 .info-window-content {
   padding: 16px;
+  color: var(--color-text);
 }
 
 .info-window-actions {

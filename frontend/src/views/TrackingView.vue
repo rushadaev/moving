@@ -12,6 +12,7 @@ import MaterialCounter from '@/components/ui/MaterialCounter.vue';
 import ChangeMoversModal from '@/components/modals/ChangeMoversModal.vue';
 import AddMaterialModal from '@/components/modals/AddMaterialModal.vue';
 import UnloadLoadModal from '@/components/modals/UnloadLoadModal.vue';
+import { NDrawer, NDrawerContent, NIcon } from 'naive-ui';
 
 const router = useRouter();
 const request = ref(null);
@@ -26,6 +27,7 @@ const showMoversModal = ref(false);
 const showMaterialModal = ref(false);
 const showUnloadLoadModal = ref(false);
 const allAddressesVisited = ref(false);
+const showDrawer = ref(false);
 
 // Unloading addresses
 const unloadingAddresses = ref([
@@ -130,6 +132,11 @@ const handleLoad = () => {
   console.log('Load operation triggered');
 };
 
+// Toggle materials drawer
+const toggleDrawer = () => {
+  showDrawer.value = !showDrawer.value;
+};
+
 // Handle marker click
 const handleMarkerClick = (marker) => {
   selectedMarker.value = marker;
@@ -207,16 +214,16 @@ onUnmounted(() => {
   <div class="tracking-view">
     <Header :title="request ? request.requestNumber : 'Request number'" />
     
-    <main class="p-0">
+    <main class="p-0 pb-24">
       <!-- Status message when on break -->
       <div v-if="onBreak" class="status-message">
-        <div class="bg-blue-100 text-blue-800 p-3 text-center rounded-lg mx-4 my-2">
+        <div class="bg-[var(--color-primary-soft)] text-[var(--color-primary)] p-3 text-center rounded-lg mx-4 my-2">
           You took a break
         </div>
       </div>
       
       <!-- Map area with floating elements -->
-      <div class="map-container relative" :style="{ height: isMoving ? 'calc(100vh - 200px)' : 'calc(100vh - 150px)' }">
+      <div class="map-container relative" :style="{ height: 'calc(100vh - 150px)' }">
         <GoogleMap 
           :height="'100%'" 
           :center="mapCenter"
@@ -229,21 +236,21 @@ onUnmounted(() => {
         
         <!-- Floating time info cards -->
         <div class="floating-time-cards">
-          <div class="bg-white bg-opacity-90 rounded-lg p-3 shadow-sm flex-1 mr-2">
-            <h2 class="text-gray-500 text-sm">Departure time</h2>
-            <p class="font-medium">{{ departureTime }}</p>
+          <div class="bg-[var(--color-background)] rounded-lg p-3 shadow-sm flex-1 mr-2">
+            <h2 class="text-[var(--color-text)] opacity-60 text-sm">Departure time</h2>
+            <p class="text-[var(--color-text)] font-medium">{{ departureTime }}</p>
           </div>
-          <div class="bg-white bg-opacity-90 rounded-lg p-3 shadow-sm flex-1 ml-2">
-            <h2 class="text-gray-500 text-sm">Travel time</h2>
-            <p class="font-medium">{{ travelTime }}</p>
+          <div class="bg-[var(--color-background)] rounded-lg p-3 shadow-sm flex-1 ml-2">
+            <h2 class="text-[var(--color-text)] opacity-60 text-sm">Travel time</h2>
+            <p class="text-[var(--color-text)] font-medium">{{ travelTime }}</p>
           </div>
         </div>
         
         <!-- Unloading addresses (shown when moving) - now as floating element -->
         <div v-if="isMoving" class="floating-addresses">
-          <div class="bg-white bg-opacity-90 rounded-lg p-3 shadow-sm">
-            <h2 class="text-gray-500 text-sm mb-2">Unloading point</h2>
-            <div v-for="address in unloadingAddresses" :key="address.id" class="font-medium mb-1">
+          <div class="bg-[var(--color-background)] rounded-lg p-3 shadow-sm">
+            <h2 class="text-[var(--color-text)] opacity-60 text-sm mb-2">Unloading point</h2>
+            <div v-for="address in unloadingAddresses" :key="address.id" class="text-[var(--color-text)] font-medium mb-1">
               {{ address.address }}
             </div>
           </div>
@@ -254,28 +261,41 @@ onUnmounted(() => {
           <MapInfoWindow :title="selectedMarker.title" @close="closeInfoWindow">
             <p>{{ selectedMarker.address }}</p>
             <template #actions>
-              <button class="text-blue-500 text-sm font-medium">View Details</button>
+              <button class="text-[var(--color-primary)] text-sm font-medium">View Details</button>
             </template>
           </MapInfoWindow>
         </div>
         
         <!-- Progress indicator -->
         <div class="absolute bottom-24 left-0 right-0 flex justify-center">
-          <div class="w-16 h-1 bg-blue-500 rounded-full"></div>
+          <div class="w-16 h-1 bg-[var(--color-primary)] rounded-full"></div>
         </div>
         
-        <!-- Floating action button -->
-        <div class="floating-action-button">
-          <GradientButton @click="mainActionHandler" class="w-full">
+        <!-- Toggle drawer button and main action button -->
+        <div class="floating-action-buttons">
+          <button v-if="isMoving" @click="toggleDrawer" class="materials-button">
+            <div class="flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13H5V11H19V13Z" fill="currentColor"/>
+                <path d="M19 17H5V15H19V17Z" fill="currentColor"/>
+                <path d="M19 9H5V7H19V9Z" fill="currentColor"/>
+              </svg>
+              <span class="ml-2">Materials & Controls</span>
+            </div>
+          </button>
+          <GradientButton @click="mainActionHandler" class="w-full mt-2">
             {{ mainActionButtonText }}
           </GradientButton>
         </div>
       </div>
-      
-      <!-- Materials section (shown when moving) -->
-      <div v-if="isMoving" class="px-4 pt-4">
-        <div class="bg-white rounded-lg p-3 shadow-sm">
-          <h2 class="text-gray-500 text-sm mb-2">Used materials</h2>
+    </main>
+    
+    <!-- Materials and controls drawer -->
+    <n-drawer v-model:show="showDrawer" :height="isMoving ? 340 : 0" placement="bottom" :trap-focus="false">
+      <n-drawer-content closable class="drawer-content bg-[var(--color-background)]">
+        <!-- Materials section -->
+        <div class="mb-4">
+          <h2 class="text-[var(--color-text)] opacity-60 text-sm mb-2">Used materials</h2>
           <div class="materials-list">
             <MaterialCounter 
               v-for="material in materials" 
@@ -286,28 +306,28 @@ onUnmounted(() => {
             />
           </div>
         </div>
-      </div>
-      
-      <!-- Action buttons (additional) -->
-      <div v-if="isMoving && !allAddressesVisited" class="p-4 action-buttons">
-        <div class="grid grid-cols-2 gap-3">
-          <SecondaryButton @click="openAddMaterialModal">
-            Add materials
-          </SecondaryButton>
-          
-          <SecondaryButton @click="openUnloadLoadModal">
-            Unload/Load
-          </SecondaryButton>
-          
-          <SecondaryButton 
-            @click="openChangeMoverModal"
-            class="col-span-2"
-          >
-            Change number of movers
-          </SecondaryButton>
+        
+        <!-- Action buttons -->
+        <div v-if="!allAddressesVisited" class="action-buttons">
+          <div class="grid grid-cols-2 gap-3">
+            <SecondaryButton @click="openAddMaterialModal">
+              Add materials
+            </SecondaryButton>
+            
+            <SecondaryButton @click="openUnloadLoadModal">
+              Unload/Load
+            </SecondaryButton>
+            
+            <SecondaryButton 
+              @click="openChangeMoverModal"
+              class="col-span-2"
+            >
+              Change number of movers
+            </SecondaryButton>
+          </div>
         </div>
-      </div>
-    </main>
+      </n-drawer-content>
+    </n-drawer>
     
     <!-- Modals -->
     <ChangeMoversModal
@@ -337,7 +357,7 @@ onUnmounted(() => {
 .tracking-view {
   min-height: 100vh;
   padding-top: 55px; /* Height of the header */
-  background-color: #f5f5f7;
+  background-color: var(--color-background-soft);
   display: flex;
   flex-direction: column;
 }
@@ -370,12 +390,29 @@ main {
   z-index: 10;
 }
 
-.floating-action-button {
+.floating-action-buttons {
   position: absolute;
   bottom: 16px;
   left: 16px;
   right: 16px;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.materials-button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: none;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .footer-container {
@@ -394,5 +431,14 @@ main {
 .action-buttons {
   display: flex;
   flex-direction: column;
+}
+
+:deep(.drawer-content) {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+:deep(.n-drawer-header__title) {
+  color: var(--color-text);
 }
 </style>

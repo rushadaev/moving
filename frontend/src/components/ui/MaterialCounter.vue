@@ -1,5 +1,5 @@
 <template>
-  <div class="material-counter">
+  <div class="material-counter bg-[var(--color-background)]">
     <div class="material-name">{{ name }}</div>
     <div class="counter-controls">
       <button 
@@ -65,7 +65,6 @@ const decrementCount = () => {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   margin-bottom: 8px;
@@ -111,5 +110,6 @@ const decrementCount = () => {
   text-align: center;
   font-size: 14px;
   font-weight: 500;
+  color: var(--color-text);
 }
 </style> 

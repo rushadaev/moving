@@ -23,6 +23,9 @@ onMounted(() => {
 const takeRequest = () => {
   console.log('Taking request:', request.value?.requestNumber);
   // Implement your logic for taking the request
+  
+  // Navigate to the tracking page
+  router.push('/tracking');
 };
 </script>
 
@@ -32,47 +35,47 @@ const takeRequest = () => {
     
     <main v-if="request" class="p-5 pb-24">
       <!-- Request Number Section -->
-      <div class="bg-white rounded-lg p-4 mb-4 shadow-sm">
-        <h2 class="text-gray-500 text-sm">Request number</h2>
-        <p class="font-medium">{{ request.requestNumber.replace('Request #', '') }}</p>
+      <div class="bg-[var(--color-background)] rounded-lg p-4 mb-4 shadow-sm">
+        <h2 class="text-[var(--color-text)] opacity-60 text-sm">Request number</h2>
+        <p class="text-[var(--color-text)] font-medium">{{ request.requestNumber.replace('Request #', '') }}</p>
       </div>
       
       <!-- Type Section -->
-      <div class="bg-white rounded-lg p-4 mb-4 shadow-sm">
-        <h2 class="text-gray-500 text-sm">Type</h2>
-        <p class="font-medium">Residential - {{ request.type }}</p>
+      <div class="bg-[var(--color-background)] rounded-lg p-4 mb-4 shadow-sm">
+        <h2 class="text-[var(--color-text)] opacity-60 text-sm">Type</h2>
+        <p class="text-[var(--color-text)] font-medium">Residential - {{ request.type }}</p>
       </div>
       
       <!-- Date and Time Section -->
       <div class="grid grid-cols-2 gap-4 mb-4">
-        <div class="bg-white rounded-lg p-4 shadow-sm">
-          <h2 class="text-gray-500 text-sm">Date</h2>
-          <p class="font-medium">{{ request.time.split('|')[0].trim() }}</p>
+        <div class="bg-[var(--color-background)] rounded-lg p-4 shadow-sm">
+          <h2 class="text-[var(--color-text)] opacity-60 text-sm">Date</h2>
+          <p class="text-[var(--color-text)] font-medium">{{ request.time.split('|')[0].trim() }}</p>
         </div>
-        <div class="bg-white rounded-lg p-4 shadow-sm">
-          <h2 class="text-gray-500 text-sm">Time</h2>
-          <p class="font-medium">{{ request.time.split('|')[1].trim() }}</p>
+        <div class="bg-[var(--color-background)] rounded-lg p-4 shadow-sm">
+          <h2 class="text-[var(--color-text)] opacity-60 text-sm">Time</h2>
+          <p class="text-[var(--color-text)] font-medium">{{ request.time.split('|')[1].trim() }}</p>
         </div>
       </div>
       
       <!-- Loading Address Section -->
-      <div class="bg-white rounded-lg p-4 mb-4 shadow-sm">
-        <h2 class="text-gray-500 text-sm">Loading address</h2>
-        <p class="font-medium">{{ request.loadingAddress }}</p>
+      <div class="bg-[var(--color-background)] rounded-lg p-4 mb-4 shadow-sm">
+        <h2 class="text-[var(--color-text)] opacity-60 text-sm">Loading address</h2>
+        <p class="text-[var(--color-text)] font-medium">{{ request.loadingAddress }}</p>
       </div>
       
       <!-- Unloading Address Section -->
-      <div class="bg-white rounded-lg p-4 mb-4 shadow-sm">
-        <h2 class="text-gray-500 text-sm">Unloading address</h2>
-        <p class="font-medium">{{ request.unloadingAddress }}</p>
+      <div class="bg-[var(--color-background)] rounded-lg p-4 mb-4 shadow-sm">
+        <h2 class="text-[var(--color-text)] opacity-60 text-sm">Unloading address</h2>
+        <p class="text-[var(--color-text)] font-medium">{{ request.unloadingAddress }}</p>
       </div>
       
       <!-- Price Section -->
       <div class="mb-6">
-        <h2 class="text-lg font-semibold mb-2">Approximate price</h2>
-        <div class="bg-white rounded-lg p-4 shadow-sm">
-          <h2 class="text-gray-500 text-sm">Price</h2>
-          <p class="font-medium">{{ request.price }}</p>
+        <h2 class="text-[var(--color-text)] text-lg font-semibold mb-2">Approximate price</h2>
+        <div class="bg-[var(--color-background)] rounded-lg p-4 shadow-sm">
+          <h2 class="text-[var(--color-text)] opacity-60 text-sm">Price</h2>
+          <p class="text-[var(--color-text)] font-medium">{{ request.price }}</p>
         </div>
       </div>
       
@@ -90,6 +93,6 @@ const takeRequest = () => {
 .details-view {
   min-height: 100vh;
   padding-top: 55px; /* Height of the header */
-  background-color: #f5f5f7;
+  background-color: var(--color-background-soft);
 }
 </style>

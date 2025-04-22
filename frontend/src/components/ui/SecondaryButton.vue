@@ -37,12 +37,12 @@ defineEmits(['click']);
   gap: 10px;
   height: 44px;
   cursor: pointer;
-  border: 1px solid #004AFF;
-  background: white;
+  border: 1px solid var(--color-text);
+  background-color: var(--color-background);
   border-radius: 10px;
   font-weight: 500;
   font-size: 14px;
-  color: #004AFF;
+  color: var(--color-text);
   transition: all 0.2s ease;
 }
 

@@ -92,7 +92,7 @@ const closeInfoWindow = () => {
   <div class="route-view">
     <Header :title="request ? `Route for ${request.requestNumber}` : 'Route'" />
     
-    <main class="p-0">
+    <main class="p-0 pb-24">
       <!-- Map with floating elements -->
       <div class="map-container relative" style="height: calc(100vh - 150px)">
         <GoogleMap 
@@ -107,16 +107,16 @@ const closeInfoWindow = () => {
         
         <!-- Floating route information -->
         <div class="floating-route-info">
-          <div class="bg-white bg-opacity-90 rounded-lg p-3 shadow-sm">
-            <h2 class="font-semibold mb-2">Route Details</h2>
+          <div class="bg-[var(--color-background)] rounded-lg p-3 shadow-sm">
+            <h2 class="text-[var(--color-text)] font-semibold mb-2">Route Details</h2>
             <div class="grid grid-cols-2 gap-4 mb-2">
               <div>
-                <span class="text-gray-500 text-sm">Distance</span>
-                <p class="font-medium">{{ routeDistance }}</p>
+                <span class="text-[var(--color-text)] opacity-60 text-sm">Distance</span>
+                <p class="text-[var(--color-text)] font-medium">{{ routeDistance }}</p>
               </div>
               <div>
-                <span class="text-gray-500 text-sm">Estimated time</span>
-                <p class="font-medium">{{ routeDuration }}</p>
+                <span class="text-[var(--color-text)] opacity-60 text-sm">Estimated time</span>
+                <p class="text-[var(--color-text)] font-medium">{{ routeDuration }}</p>
               </div>
             </div>
           </div>
@@ -124,14 +124,14 @@ const closeInfoWindow = () => {
         
         <!-- Floating addresses -->
         <div class="floating-addresses">
-          <div class="bg-white bg-opacity-90 rounded-lg p-3 shadow-sm">
+          <div class="bg-[var(--color-background)] rounded-lg p-3 shadow-sm">
             <div class="mb-3">
-              <span class="text-gray-500 text-sm">From</span>
-              <p class="font-medium">{{ request?.loadingAddress || 'Loading address' }}</p>
+              <span class="text-[var(--color-text)] opacity-60 text-sm">From</span>
+              <p class="text-[var(--color-text)] font-medium">{{ request?.loadingAddress || 'Loading address' }}</p>
             </div>
             <div>
-              <span class="text-gray-500 text-sm">To</span>
-              <p class="font-medium">{{ request?.unloadingAddress || 'Unloading address' }}</p>
+              <span class="text-[var(--color-text)] opacity-60 text-sm">To</span>
+              <p class="text-[var(--color-text)] font-medium">{{ request?.unloadingAddress || 'Unloading address' }}</p>
             </div>
           </div>
         </div>
@@ -152,7 +152,8 @@ const closeInfoWindow = () => {
 <style scoped>
 .route-view {
   min-height: 100vh;
-  background-color: #f5f5f7;
+  padding-top: 55px; /* Height of the header */
+  background-color: var(--color-background-soft);
 }
 
 .map-container {
