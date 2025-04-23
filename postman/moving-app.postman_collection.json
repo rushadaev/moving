@@ -31,7 +31,8 @@
 							"raw": "{{base_url}}/api/v1/register",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "register"]
-						}
+						},
+						"description": "Register a new user in the system. Returns an authentication token."
 					}
 				},
 				{
@@ -56,7 +57,8 @@
 							"raw": "{{base_url}}/api/v1/login",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "login"]
-						}
+						},
+						"description": "Login with email and password. Returns an authentication token."
 					}
 				},
 				{
@@ -77,7 +79,8 @@
 							"raw": "{{base_url}}/api/v1/user",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "user"]
-						}
+						},
+						"description": "Get the currently authenticated user's details."
 					}
 				},
 				{
@@ -98,7 +101,8 @@
 							"raw": "{{base_url}}/api/v1/logout",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "logout"]
-						}
+						},
+						"description": "Logout the current user and invalidate the token."
 					}
 				},
 				{
@@ -118,19 +122,196 @@
 						}
 					}
 				}
-			]
+			],
+			"description": "Authentication related endpoints"
+		},
+		{
+			"name": "Requests",
+			"item": [
+				{
+					"name": "Create Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"property_type\": \"residential\",\n    \"square_feet\": 1000,\n    \"additional_objects\": [\"garage\", \"storage\"],\n    \"movers_count\": 3,\n    \"hourly_rate\": 125,\n    \"departure_time\": \"2024-12-11T12:00:00Z\",\n    \"labor_included\": true,\n    \"package_type\": \"standard\",\n    \"addresses\": [\n        {\n            \"address\": \"123 Main St\",\n            \"type\": \"loading\",\n            \"order\": 0,\n            \"latitude\": 40.7128,\n            \"longitude\": -74.0060\n        },\n        {\n            \"address\": \"456 Park Ave\",\n            \"type\": \"intermediate\",\n            \"order\": 1,\n            \"latitude\": 40.7527,\n            \"longitude\": -73.9772\n        },\n        {\n            \"address\": \"789 Broadway\",\n            \"type\": \"unloading\",\n            \"order\": 2,\n            \"latitude\": 40.7589,\n            \"longitude\": -73.9851\n        }\n    ],\n    \"materials\": [\n        {\n            \"name\": \"Boxes\",\n            \"quantity\": 10\n        },\n        {\n            \"name\": \"Furniture\",\n            \"quantity\": 5\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/requests",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "requests"]
+						},
+						"description": "Create a new moving request with addresses and materials. All addresses must include latitude and longitude coordinates."
+					}
+				},
+				{
+					"name": "List Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/requests",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "requests"]
+						},
+						"description": "Get a paginated list of all requests with their addresses and materials."
+					}
+				},
+				{
+					"name": "Get Request Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/requests/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "requests", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "The ID of the request"
+								}
+							]
+						},
+						"description": "Get detailed information about a specific request including its addresses and materials."
+					}
+				},
+				{
+					"name": "Update Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"movers_count\": 4,\n    \"departure_time\": \"2024-12-11T14:00:00Z\",\n    \"addresses\": [\n        {\n            \"address\": \"123 Main St\",\n            \"type\": \"loading\",\n            \"order\": 0,\n            \"latitude\": 40.7128,\n            \"longitude\": -74.0060\n        },\n        {\n            \"address\": \"789 Broadway\",\n            \"type\": \"unloading\",\n            \"order\": 1,\n            \"latitude\": 40.7589,\n            \"longitude\": -73.9851\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/requests/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "requests", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "The ID of the request to update"
+								}
+							]
+						},
+						"description": "Update an existing request. When updating addresses, you must provide all addresses with their coordinates as the existing ones will be replaced."
+					}
+				},
+				{
+					"name": "Delete Request",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/requests/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "requests", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "The ID of the request to delete"
+								}
+							]
+						},
+						"description": "Delete a request and all its associated addresses and materials."
+					}
+				},
+				{
+					"name": "List User Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/requests/user",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "requests", "user"]
+						}
+					}
+				}
+			],
+			"description": "Moving request management endpoints"
 		}
 	],
 	"variable": [
 		{
 			"key": "base_url",
 			"value": "http://localhost:8080",
-			"type": "string"
+			"type": "string",
+			"description": "Base URL for the API"
 		},
 		{
 			"key": "token",
 			"value": "your-auth-token",
-			"type": "string"
+			"type": "string",
+			"description": "Authentication token received after login"
 		}
 	]
 }

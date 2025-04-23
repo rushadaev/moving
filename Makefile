@@ -1,11 +1,15 @@
-.PHONY: install up-dev down-dev build-dev rebuild-dev up-prod down-prod build-prod rebuild-prod restart logs frontend backend mysql clear-cache-dev clear-cache-prod
+.PHONY: install up-dev down-dev build-dev rebuild-dev up-prod down-prod build-prod rebuild-prod restart logs frontend backend mysql clear-cache-dev clear-cache-prod generate-key
+
+# Generate Laravel application key
+generate-key:
+	docker compose -f docker-compose.dev.yml exec backend php artisan key:generate --force
 
 # Installation command
 install:
 	cp .env.example .env
 	make up-dev
 	docker compose -f docker-compose.dev.yml exec backend composer install
-	docker compose -f docker-compose.dev.yml exec backend php artisan key:generate
+	make generate-key
 	docker compose -f docker-compose.dev.yml exec backend php artisan migrate:fresh --seed
 	docker compose -f docker-compose.dev.yml exec frontend npm install
 

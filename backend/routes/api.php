@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\RequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,9 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // User management routes
     Route::apiResource('users', UserController::class);
+
+    // Request management routes
+    Route::apiResource('requests', RequestController::class);
 });
 
 // Health check endpoint
