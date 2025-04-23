@@ -82,6 +82,7 @@ class RequestController extends Controller
             'departure_time' => 'sometimes|required|date',
             'labor_included' => 'sometimes|required|boolean',
             'package_type' => 'nullable|string',
+            'status' => 'sometimes|required|in:pending,confirmed,active,break,completed,cancelled',
             'addresses' => 'sometimes|required|array|min:2',
             'addresses.*.address' => 'required|string',
             'addresses.*.type' => 'required|in:loading,unloading,intermediate',
