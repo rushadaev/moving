@@ -13,7 +13,7 @@
       <button 
         class="counter-btn" 
         @click="decrementCount"
-        :disabled="disabled || count === 0"
+        :disabled="disabled || count <= 1"
       >
         -
       </button>
@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 
 const props = defineProps({
   name: {
@@ -31,7 +31,7 @@ const props = defineProps({
   },
   initialCount: {
     type: Number,
-    default: 0
+    default: 1
   },
   disabled: {
     type: Boolean,
@@ -40,10 +40,16 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:count']);
-const count = ref(props.initialCount);
+const count = ref(Math.max(1, props.initialCount));
+
+onMounted(() => {
+  if (props.initialCount < 1) {
+    emit('update:count', { name: props.name, count: 1 });
+  }
+});
 
 watch(() => props.initialCount, (newValue) => {
-  count.value = newValue;
+  count.value = Math.max(1, newValue);
 });
 
 const incrementCount = () => {
@@ -52,7 +58,7 @@ const incrementCount = () => {
 };
 
 const decrementCount = () => {
-  if (count.value > 0) {
+  if (count.value > 1) {
     count.value--;
     emit('update:count', { name: props.name, count: count.value });
   }

@@ -12,7 +12,7 @@
       
       <div class="action-buttons">
         <Button @click="onCancel">Cancel</Button>
-        <GradientButton @click="onAdd" :disabled="!isValid">Add</GradientButton>
+        <GradientButton small-button="true" @click="onAdd" :disabled="!isValid">Add</GradientButton>
       </div>
     </div>
   </Modal>
@@ -26,19 +26,19 @@ import Button from '@/components/ui/Button.vue';
 import GradientButton from '@/components/ui/GradientButton.vue';
 
 const props = defineProps({
-  modelValue: {
+  show: {
     type: Boolean,
     default: false
   }
 });
 
-const emit = defineEmits(['update:modelValue', 'add', 'cancel']);
+const emit = defineEmits(['update:show', 'add', 'cancel']);
 
-const isModalOpen = ref(props.modelValue);
+const isModalOpen = ref(props.show);
 const materialName = ref('');
 const isValid = ref(false);
 
-watch(() => props.modelValue, (newValue) => {
+watch(() => props.show, (newValue) => {
   isModalOpen.value = newValue;
   if (newValue) {
     // Reset form when modal opens
@@ -48,7 +48,7 @@ watch(() => props.modelValue, (newValue) => {
 });
 
 watch(isModalOpen, (newValue) => {
-  emit('update:modelValue', newValue);
+  emit('update:show', newValue);
 });
 
 const validateInput = () => {

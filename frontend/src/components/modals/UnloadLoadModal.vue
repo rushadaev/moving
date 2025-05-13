@@ -6,11 +6,11 @@
       </div>
       
       <div class="operation-buttons">
-        <GradientButton @click="onUnload" class="mb-3">
+        <GradientButton small-button="true" @click="onUnload" class="mb-3">
           Unload at current location
         </GradientButton>
         
-        <GradientButton @click="onLoad">
+        <GradientButton small-button="true" @click="onLoad">
           Load from current location
         </GradientButton>
       </div>

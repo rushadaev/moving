@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Request as MovingRequest;
 use App\Repositories\Interfaces\RequestRepositoryInterface;
 use Illuminate\Support\Str;
 
@@ -52,7 +53,7 @@ class RequestService
             $requestNumber = $prefix . '-' . strtoupper(Str::random(8));
             
             // Check if request number already exists
-            $exists = \App\Models\Request::where('request_number', $requestNumber)->exists();
+            $exists = MovingRequest::where('request_number', $requestNumber)->exists();
             
             if (!$exists) {
                 $unique = true;

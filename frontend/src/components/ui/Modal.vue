@@ -31,12 +31,16 @@
 
 <script setup lang="ts">
 import { NModal, NCard } from 'naive-ui';
-import { ref, watch } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 
 const props = defineProps({
   modelValue: {
     type: Boolean,
     default: false
+  },
+  show: {
+    type: Boolean,
+    default: undefined
   },
   title: {
     type: String,
@@ -48,15 +52,46 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['update:modelValue']);
-const showModal = ref(props.modelValue);
+const emit = defineEmits(['update:modelValue', 'update:show']);
 
-watch(() => props.modelValue, (newValue) => {
-  showModal.value = newValue;
+// Determine which prop to use (prioritize show over modelValue if both are provided)
+const isVisible = computed(() => {
+  if (props.show !== undefined) return props.show;
+  return props.modelValue;
 });
 
+const showModal = ref(isVisible.value);
+
+onMounted(() => {
+  console.log('Modal mounted with props:', { 
+    modelValue: props.modelValue, 
+    show: props.show,
+    computed: isVisible.value
+  });
+});
+
+// Watch for changes to either prop
+watch(() => props.modelValue, (newValue) => {
+  console.log('modelValue changed:', newValue);
+  if (props.show === undefined) {
+    showModal.value = newValue;
+  }
+});
+
+watch(() => props.show, (newValue) => {
+  console.log('show changed:', newValue);
+  if (newValue !== undefined) {
+    showModal.value = newValue;
+  }
+});
+
+// Emit updates for both properties
 watch(showModal, (newValue) => {
+  console.log('showModal changed:', newValue);
   emit('update:modelValue', newValue);
+  if (props.show !== undefined) {
+    emit('update:show', newValue);
+  }
 });
 </script>
 
