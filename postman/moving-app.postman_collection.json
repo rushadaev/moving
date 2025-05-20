@@ -372,6 +372,101 @@
 				}
 			],
 			"description": "Moving request management endpoints"
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Create Payment Session",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 100,\n    \"currency\": \"usd\",\n    \"request_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/payments/create-intent",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "payments", "create-intent"]
+						},
+						"description": "Create a new payment session for a request. Returns a session ID and redirect URL for Stripe Checkout."
+					}
+				},
+				{
+					"name": "Confirm Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"session_id\": \"cs_test_xxx\",\n    \"request_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/payments/confirm",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "payments", "confirm"]
+						},
+						"description": "Confirm a payment and update the request status to paid."
+					}
+				},
+				{
+					"name": "Get Payment Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/payments/status/:sessionId",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "payments", "status", ":sessionId"],
+							"variable": [
+								{
+									"key": "sessionId",
+									"value": "cs_test_xxx",
+									"description": "The ID of the payment session"
+								}
+							]
+						},
+						"description": "Get the current status of a payment session."
+					}
+				}
+			],
+			"description": "Payment processing endpoints using Stripe"
 		}
 	],
 	"variable": [

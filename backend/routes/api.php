@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\RequestController;
+use App\Http\Controllers\Api\V1\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,12 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Request management routes
     Route::apiResource('requests', RequestController::class);
+    Route::get('/requests/user', [RequestController::class, 'userRequests']);
+
+    // Payment routes
+    Route::post('/payments/create-intent', [PaymentController::class, 'createPaymentIntent']);
+    Route::post('/payments/confirm', [PaymentController::class, 'confirmPayment']);
+    Route::get('/payments/status/{paymentIntentId}', [PaymentController::class, 'getPaymentStatus']);
 });
 
 // Health check endpoint

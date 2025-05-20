@@ -1,14 +1,15 @@
 # Moving App
 
-Full-stack application with Laravel backend and Vue.js frontend.
+A full-stack application for managing moving requests with payment integration.
 
 ## Prerequisites
 
 - Docker and Docker Compose
-- Git
-- Postman (for API testing)
+- Node.js (for local development)
+- PHP 8.2 (for local development)
+- Composer (for local development)
 
-## Quick Start
+## Setup
 
 1. Clone the repository:
 ```bash
@@ -16,119 +17,118 @@ git clone https://github.com/rushadaev/moving.git
 cd moving
 ```
 
-2. Install and run the project:
+2. Copy the environment file:
+```bash
+cp .env.example .env
+```
+
+3. Start the development environment:
+```bash
+make up-dev
+```
+
+4. Install dependencies and run migrations:
 ```bash
 make install
 ```
 
-This command will:
-- Copy the environment file
-- Start Docker containers
-- Install backend dependencies
-- Generate application key
-- Run database migrations and seeders
-- Install frontend dependencies
-
 ## Default Access
 
-After installation, you'll have access to:
-
-- Default user:
-  - Email: test@example.com
-  - Password: password
-  - Role: user
-
-## API Testing with Postman
-
-1. Import the Postman collection:
-   - Open Postman
-   - Click "Import"
-   - Select the file: `postman/moving-app.postman_collection.json`
-
-2. Set up environment variables:
-   - Create a new environment in Postman
-   - Add variables:
-     - `base_url`: `http://localhost:8080`
-     - `token`: Leave empty (will be filled after login)
-
-3. Authentication Flow:
-   1. Use "Register" request to create a new account
-   2. Use "Login" request with your credentials
-   3. Copy the token from the response
-   4. Set the token in your environment variables
-   5. Now you can use protected endpoints
-
-Available Endpoints:
-- Authentication:
-  - `POST /api/v1/register` - Register new user
-  - `POST /api/v1/login` - Login
-  - `GET /api/v1/user` - Get current user (protected)
-  - `POST /api/v1/logout` - Logout (protected)
-  - `GET /sanctum/csrf-cookie` - Get CSRF cookie
-
-## Development
-
-The application runs on:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8080
-- Database: MySQL (Port 3306)
+- Database: MySQL (localhost:3306)
+  - Database: laravel
+  - Username: laravel
+  - Password: secret
+
+## Using Postman Collection
+
+1. Import the collection from `postman/moving-app.postman_collection.json`
+2. Set up environment variables:
+   - `base_url`: http://localhost:8080
+   - `token`: Your authentication token (received after login)
+
+### Available Endpoints
+
+#### Authentication
+- POST `/api/v1/register` - Register a new user
+- POST `/api/v1/login` - Login and get authentication token
+- GET `/api/v1/user` - Get current user details
+- POST `/api/v1/logout` - Logout and invalidate token
+
+#### Requests
+- GET `/api/v1/requests` - List all requests
+- POST `/api/v1/requests` - Create a new request
+- GET `/api/v1/requests/{id}` - Get request details
+- PUT `/api/v1/requests/{id}` - Update a request
+- DELETE `/api/v1/requests/{id}` - Delete a request
+- GET `/api/v1/requests/user` - List user's requests
+
+#### Payments
+- POST `/api/v1/payments/create-intent` - Create a payment intent with redirect URLs
+- POST `/api/v1/payments/confirm` - Confirm a payment
+- GET `/api/v1/payments/status/{paymentIntentId}` - Check payment status
+
+## Development Environment
+
+The application uses Docker for development. The following services are available:
+
+- Frontend (Vite + React)
+- Backend (Laravel)
+- MySQL Database
+- Nginx
 
 ## Available Make Commands
 
 ### Development Commands
-```bash
-# Start development environment
-make up-dev
-
-# Stop development environment
-make down-dev
-
-# Build development containers
-make build-dev
-
-# Rebuild development containers from scratch
-make rebuild-dev
-
-# Clear development cache
-make clear-cache-dev
-```
+- `make up-dev` - Start development environment
+- `make down-dev` - Stop development environment
+- `make build-dev` - Build development containers
+- `make rebuild-dev` - Rebuild development containers
+- `make clear-cache-dev` - Clear Laravel cache in development
 
 ### Production Commands
-```bash
-# Start production environment
-make up-prod
-
-# Stop production environment
-make down-prod
-
-# Build production containers
-make build-prod
-
-# Rebuild production containers from scratch
-make rebuild-prod
-
-# Clear and optimize production cache
-make clear-cache-prod
-```
+- `make up-prod` - Start production environment
+- `make down-prod` - Stop production environment
+- `make build-prod` - Build production containers
+- `make rebuild-prod` - Rebuild production containers
+- `make clear-cache-prod` - Clear Laravel cache in production
 
 ### Common Commands
-```bash
-# Restart all containers
-make restart
+- `make restart` - Restart all containers
+- `make logs` - View container logs
+- `make frontend` - Access frontend container shell
+- `make backend` - Access backend container shell
+- `make mysql` - Access MySQL container shell
 
-# View logs
-make logs
+## Payment Integration
 
-# Access container shells
-make frontend  # Frontend container shell
-make backend   # Backend container shell
-make mysql     # MySQL shell
+The application uses Stripe for payment processing. To set up payments:
+
+1. Add your Stripe API keys to `.env`:
+```
+STRIPE_KEY=your_publishable_key
+STRIPE_SECRET=your_secret_key
+STRIPE_WEBHOOK_SECRET=your_webhook_secret
 ```
 
-## User Roles
+2. The payment flow:
+   - Create a payment intent with amount, request ID, and redirect URLs
+   - User is redirected to Stripe Checkout page
+   - After payment, user is redirected back to your success/cancel URL
+   - Confirm the payment on the backend
+   - Check payment status as needed
 
-The application uses Spatie Laravel Permission for role management. Default roles:
-- admin
-- user
+3. Supported payment methods:
+   - Credit/Debit Cards
+   - Apple Pay
+   - Google Pay
 
-New users automatically get the 'user' role upon registration.
+## Role Management
+
+The application uses Spatie's Laravel Permission package for role management. Default roles are created during seeding:
+
+- Admin
+- User
+
+Roles are automatically assigned during user registration.
