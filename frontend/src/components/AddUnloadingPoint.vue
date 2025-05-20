@@ -14,7 +14,7 @@
         <slot name="footer">
           <div class="button-group">
             <Button @click="onCancel">Cancel</Button>
-            <GradientButton @click="onAdd">Add</GradientButton>
+            <GradientButton small-button="true" @click="onAdd">Add</GradientButton>
           </div>
         </slot>
       </div>

@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use App\Models\Request;
+use App\Models\Request as MovingRequest;
 use App\Repositories\Interfaces\RequestRepositoryInterface;
 
 class RequestRepository implements RequestRepositoryInterface
 {
     protected $model;
 
-    public function __construct(Request $model)
+    public function __construct(MovingRequest $model)
     {
         $this->model = $model;
     }

@@ -3,6 +3,7 @@
     <div class="action-buttons-container">
       <slot>
         <GradientButton 
+          small-button="true"
           v-if="showAddPoint" 
           @click="$emit('addPoint')" 
           class="action-button"

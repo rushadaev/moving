@@ -11,6 +11,7 @@
       :show-count="showCount"
       @blur="handleBlur"
       @input="handleInput"
+      @change="handleChange"
     >
       <template #suffix v-if="unit">
         <span class="unit">{{ unit }}</span>
@@ -21,7 +22,7 @@
 
 <script setup lang="ts">
 import { NInput } from 'naive-ui';
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -62,11 +63,24 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['update:modelValue', 'blur', 'input']);
+const emit = defineEmits(['update:modelValue', 'blur', 'input', 'change']);
 const inputValue = ref(props.modelValue);
 
+// Initialize value properly on mount
+onMounted(() => {
+  if (props.type === 'number' && props.modelValue !== '') {
+    // Ensure number inputs have proper formatting
+    const numValue = Number(props.modelValue);
+    if (!isNaN(numValue)) {
+      inputValue.value = props.modelValue.toString();
+    }
+  }
+});
+
 watch(() => props.modelValue, (newValue) => {
-  inputValue.value = newValue;
+  if (newValue !== inputValue.value) {
+    inputValue.value = newValue;
+  }
 });
 
 watch(inputValue, (newValue) => {
@@ -75,10 +89,22 @@ watch(inputValue, (newValue) => {
 
 const handleBlur = (e: Event) => {
   emit('blur', e);
+  
+  // For number inputs, ensure we have a valid number format
+  if (props.type === 'number' && inputValue.value !== '') {
+    const numValue = Number(inputValue.value);
+    if (!isNaN(numValue)) {
+      inputValue.value = numValue.toString();
+    }
+  }
 };
 
 const handleInput = (e: Event) => {
   emit('input', e);
+};
+
+const handleChange = (e: Event) => {
+  emit('change', e);
 };
 </script>
 

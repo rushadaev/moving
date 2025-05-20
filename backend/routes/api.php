@@ -34,6 +34,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class);
 
     // Request management routes
+    Route::get('requests/user', [RequestController::class, 'getUserRequests']);
     Route::apiResource('requests', RequestController::class);
     Route::get('/requests/user', [RequestController::class, 'userRequests']);
 

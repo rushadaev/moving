@@ -23,7 +23,7 @@ const themeOverrides = {
 
 <template>
   <n-config-provider :theme-overrides="themeOverrides">
-    <Header title="Header"/>
+    <Header title="Moving App"/>
     <RouterView class="py-[75px]" />
     <Footer/>
   </n-config-provider>

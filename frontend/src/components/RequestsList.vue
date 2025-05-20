@@ -1,65 +1,99 @@
 <script setup lang="ts">
 import RequestItem from './RequestItem.vue'
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRequestsStore, type Request } from '../stores/requests'
 
-const router = useRouter();
+const props = defineProps<{
+  requests: Request[]
+}>()
 
-const items = [
-  {
-    requestNumber: "Request #1",
-    price: "12$",
-    type: "3 bedroom",
-    time: "12/11/24 | 12:00",
-    loadingAddress: "123 Main St, City A",
-    unloadingAddress: "456 Elm St, City B",
-  },
-  {
-    requestNumber: "Request #2",
-    price: "15$",
-    type: "2 bedroom",
-    time: "12/12/24 | 14:00",
-    loadingAddress: "789 Oak St, City C",
-    unloadingAddress: "321 Pine St, City D",
-  },
-  {
-    requestNumber: "Request #3",
-    price: "18$",
-    type: "1 bedroom",
-    time: "12/13/24 | 10:30",
-    loadingAddress: "456 Maple St, City E",
-    unloadingAddress: "654 Birch St, City F",
-  },
-  {
-    requestNumber: "Request #4",
-    price: "20$",
-    type: "4 bedroom",
-    time: "12/14/24 | 09:00",
-    loadingAddress: "101 Walnut St, City G",
-    unloadingAddress: "202 Cedar St, City H",
-  },
-]
+const router = useRouter()
+const requestsStore = useRequestsStore()
+const loading = ref(false)
+
+const formattedRequests = computed(() => {
+  return props.requests.map(request => {
+    // Find loading and unloading addresses
+    const loadingAddress = request.addresses.find(addr => addr.type === 'loading')?.address || 'No loading address'
+    const unloadingAddress = request.addresses.find(addr => addr.type === 'unloading')?.address || 'No unloading address'
+    
+    // Format date for display
+    const date = new Date(request.departure_time)
+    const formattedDate = date.toLocaleDateString()
+    const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    
+    return {
+      id: request.id,
+      requestNumber: `Request #${request.id}`,
+      price: `$${request.hourly_rate}/hr`,
+      type: request.property_type,
+      time: `${formattedDate} | ${formattedTime}`,
+      loadingAddress,
+      unloadingAddress,
+      status: request.status || 'pending',
+      fullRequest: request // Store the full request data
+    }
+  })
+})
 
 // Navigate to details view when a request is clicked
-const showRequestDetails = (item) => {
-  // Store the selected request in localStorage to access it on the details page
-  localStorage.setItem('selectedRequest', JSON.stringify(item));
-  router.push('/details');
-};
+const showRequestDetails = async (item) => {
+  if (!item.id) {
+    console.error("Request has no ID")
+    return
+  }
+  
+  console.log(`Attempting to navigate to details for request ID: ${item.id}`, item)
+  
+  try {
+    loading.value = true
+    // Navigate directly without waiting for API call
+    router.push({
+      path: '/details',
+      query: { id: item.id.toString() }
+    })
+    
+    // Load the request data in the background
+    await requestsStore.getRequestById(item.id)
+  } catch (err) {
+    console.error('Error navigating to details:', err)
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
   <div class="w-full">
     <h1 class="text-2xl font-bold mb-4 ml-2">Requests</h1>
-    <div class="grid gap-5 w-full justify-center items-center grid-cols-1">
-      <RequestItem
-        v-for="item in items"
-        :key="item.requestNumber"
-        :item="item"
+    
+    <div v-if="loading" class="text-center p-6">
+      <p>Loading request details...</p>
+    </div>
+    
+    <div v-else-if="formattedRequests.length === 0" class="text-center p-6">
+      <p>You don't have any moving requests yet.</p>
+      <button 
+        @click="router.push('/details')" 
+        class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Create New Request
+      </button>
+    </div>
+    
+    <div v-else class="grid gap-5 w-full justify-center items-center grid-cols-1">
+      <div 
+        v-for="item in formattedRequests" 
+        :key="item.id"
         @click="showRequestDetails(item)"
         class="cursor-pointer"
       >
-        Request
-      </RequestItem>
+        <RequestItem 
+          :item="item"
+          :disabled="loading"
+        />
+      </div>
     </div>
   </div>
 </template>

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Request;
+use App\Models\Request as MovingRequest;
 use App\Models\Address;
 use App\Models\Material;
 use Illuminate\Http\Request as HttpRequest;
@@ -13,7 +13,18 @@ class RequestController extends Controller
 {
     public function index()
     {
-        $requests = Request::with(['addresses', 'materials'])->paginate(10);
+        $requests = MovingRequest::with(['addresses', 'materials'])->paginate(10);
+        return response()->json($requests);
+    }
+
+    public function getUserRequests()
+    {
+        $userId = auth()->id();
+        $requests = MovingRequest::where('user_id', $userId)
+            ->with(['addresses', 'materials'])
+            ->latest()
+            ->paginate(10);
+        
         return response()->json($requests);
     }
 
@@ -43,7 +54,7 @@ class RequestController extends Controller
         $validated['user_id'] = auth()->id();
         $validated['status'] = 'pending';
 
-        $movingRequest = Request::create($validated);
+        $movingRequest = MovingRequest::create($validated);
 
         // Create addresses
         foreach ($request->addresses as $address) {
@@ -66,13 +77,16 @@ class RequestController extends Controller
         return response()->json($movingRequest->load(['addresses', 'materials']), 201);
     }
 
-    public function show(Request $request)
+    public function show($id)
     {
-        return response()->json($request->load(['addresses', 'materials']));
+        $request = MovingRequest::with(['addresses', 'materials'])->findOrFail($id);
+        return response()->json($request);
     }
 
-    public function update(HttpRequest $httpRequest, Request $request)
+    public function update(HttpRequest $httpRequest, $id)
     {
+        $request = MovingRequest::findOrFail($id);
+        
         $validated = $httpRequest->validate([
             'property_type' => 'sometimes|required|in:commercial,residential',
             'square_feet' => 'nullable|numeric',
@@ -119,8 +133,9 @@ class RequestController extends Controller
         return response()->json($request->load(['addresses', 'materials']));
     }
 
-    public function destroy(Request $request)
+    public function destroy($id)
     {
+        $request = MovingRequest::findOrFail($id);
         $request->delete();
         return response()->noContent();
     }
