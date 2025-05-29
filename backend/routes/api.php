@@ -36,7 +36,6 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     // Request management routes
     Route::get('requests/user', [RequestController::class, 'getUserRequests']);
     Route::apiResource('requests', RequestController::class);
-    Route::get('/requests/user', [RequestController::class, 'userRequests']);
 
     // Payment routes
     Route::post('/payments/create-intent', [PaymentController::class, 'createPaymentIntent']);

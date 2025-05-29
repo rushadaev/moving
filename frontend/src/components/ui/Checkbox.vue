@@ -47,8 +47,21 @@ const handleChange = (checked: boolean) => {
   align-items: center;
 }
 
+:deep(.n-checkbox .n-checkbox-box) {
+  background: #111 !important;
+  border: 1.5px solid #fff !important;
+}
+:deep(.n-checkbox .n-checkbox-box__border) {
+  border-color: #fff !important;
+}
+:deep(.n-checkbox .n-checkbox-box__check) {
+  color: #fff !important;
+}
+:deep(.n-checkbox .n-checkbox__label) {
+  color: #fff !important;
+}
 .checked-label {
   font-weight: 500;
-  color: var(--color-text);
+  color: #fff;
 }
 </style> 

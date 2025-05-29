@@ -12,6 +12,7 @@
       @blur="handleBlur"
       @input="handleInput"
       @change="handleChange"
+      class="text-black"
     >
       <template #suffix v-if="unit">
         <span class="unit">{{ unit }}</span>
@@ -117,5 +118,15 @@ const handleChange = (e: Event) => {
   margin-left: 4px;
   color: var(--color-text);
   opacity: 0.6;
+}
+
+:deep(.n-input .n-input__input) {
+  background: #111 !important;
+  color: #fff !important;
+  border: 1px solid #333 !important;
+}
+:deep(.n-input .n-input__input::placeholder) {
+  color: #fff !important;
+  opacity: 1;
 }
 </style> 

@@ -76,10 +76,14 @@ const mapMarkers = computed(() => {
   
   return requestsStore.selectedRequest.addresses.map(addr => {
     const isLoading = addr.type === 'loading';
+    // Ensure coordinates are numbers
+    const lat = parseFloat(addr.latitude);
+    const lng = parseFloat(addr.longitude);
+    
     return {
       position: { 
-        lat: addr.latitude, 
-        lng: addr.longitude 
+        lat: isNaN(lat) ? 40.7128 : lat, 
+        lng: isNaN(lng) ? -74.0060 : lng 
       },
       title: isLoading ? 'Loading Point' : 'Unloading Point',
       icon: {
@@ -396,14 +400,20 @@ onMounted(async () => {
     
     // Set map center to the first address if available
     if (requestsStore.selectedRequest.addresses?.length > 0) {
-      const firstAddr = requestsStore.selectedRequest.addresses[0]
-      mapCenter.value = { 
-        lat: firstAddr.latitude, 
-        lng: firstAddr.longitude 
+      const firstAddr = requestsStore.selectedRequest.addresses[0];
+      const lat = parseFloat(firstAddr.latitude);
+      const lng = parseFloat(firstAddr.longitude);
+      
+      if (!isNaN(lat) && !isNaN(lng)) {
+        mapCenter.value = { lat, lng };
+        console.log('Map center set to:', mapCenter.value);
+      } else {
+        console.warn('Invalid coordinates, using default map center');
+        mapCenter.value = { lat: 40.7128, lng: -74.0060 }; // Default to NYC
       }
-      console.log('Map center set to:', mapCenter.value)
     } else {
-      console.warn('Request has no addresses, using default map center')
+      console.warn('Request has no addresses, using default map center');
+      mapCenter.value = { lat: 40.7128, lng: -74.0060 }; // Default to NYC
     }
     
     // Set number of movers
@@ -437,7 +447,13 @@ watch(() => requestsStore.selectedRequest?.status, (newStatus, oldStatus) => {
 // Keep the map centered when markers change
 watchEffect(() => {
   if (mapMarkers.value.length > 0 && !selectedMarker.value) {
-    mapCenter.value = mapMarkers.value[0].position;
+    const firstMarker = mapMarkers.value[0];
+    if (firstMarker && firstMarker.position) {
+      mapCenter.value = {
+        lat: parseFloat(firstMarker.position.lat) || 40.7128,
+        lng: parseFloat(firstMarker.position.lng) || -74.0060
+      };
+    }
   }
 });
 
