@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   frontend:
     build:
@@ -15,6 +17,7 @@ services:
 
   nginx:
     image: nginx:alpine
+    container_name: moving-nginx-1  # 👈 обязательно, чтобы nginx-gateway мог обратиться по имени
     ports:
       - "8081:80"
     volumes:
@@ -26,6 +29,7 @@ services:
       - backend
     networks:
       - app-network
+      - gateway-net  # 👈 добавлено
 
   backend:
     build:
@@ -75,8 +79,10 @@ services:
 networks:
   app-network:
     driver: bridge
+  gateway-net:          # 👈 добавлено
+    external: true
 
 volumes:
   mysql_data:
   frontend_dist:
-  backend_vendor: 
+  backend_vendor:
