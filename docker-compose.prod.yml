@@ -18,8 +18,8 @@ services:
   nginx:
     image: nginx:alpine
     container_name: moving-nginx-1  # 👈 обязательно, чтобы nginx-gateway мог обратиться по имени
-    ports:
-      - "8081:80"
+#    ports:
+#      - "8081:80"
     volumes:
       - ./nginx/conf.d/prod.conf:/etc/nginx/conf.d/default.conf
       - frontend_dist:/var/www/frontend
