@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import RequestsView from '../views/RequestsView.vue'
+import LandingView from '../views/LandingView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
@@ -8,7 +9,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: RequestsView,
+      component: LandingView,
     },
     {
       path: '/auth',
