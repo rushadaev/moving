@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#2c4a5a] min-h-screen flex flex-col items-center">
+  <div class="min-h-screen flex flex-col items-center">
     <!-- Header -->
     <header class="p-6 flex flex-col items-center bg-[#2c4a5a] rounded-xl m-4 w-full max-w-3xl border border-[#e6e6e6]">
       <img src="@/assets/logo.svg" alt="Moowee Logo" class="w-24 mb-2" />
@@ -122,4 +122,4 @@
 .icon {
   @apply underline;
 }
-</style> 
+</style>
