@@ -30,7 +30,6 @@ services:
       - backend
     networks:
       - app-network
-      - gateway-net
 
   backend:
     build:
@@ -80,8 +79,6 @@ services:
 networks:
   app-network:
     driver: bridge
-  gateway-net:
-    external: true
 
 volumes:
   mysql_data:
