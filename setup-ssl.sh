@@ -18,9 +18,9 @@ fi
 echo -e "${YELLOW}Updating system packages...${NC}"
 yum update -y
 
-# Install certbot
-echo -e "${YELLOW}Installing certbot...${NC}"
-yum install -y certbot python3-certbot-nginx
+# Install nginx and certbot
+echo -e "${YELLOW}Installing nginx and certbot...${NC}"
+yum install -y nginx certbot python3-certbot-nginx
 
 # Stop nginx container temporarily
 echo -e "${YELLOW}Stopping nginx container...${NC}"
@@ -32,25 +32,12 @@ echo -e "${YELLOW}Starting nginx on host for certificate verification...${NC}"
 systemctl start nginx
 systemctl enable nginx
 
-# Create temporary nginx config for certbot
-echo -e "${YELLOW}Creating temporary nginx configuration...${NC}"
-cat > /etc/nginx/conf.d/mooweemoving.conf << 'EOF'
-server {
-    listen 80;
-    server_name mooweemoving.com www.mooweemoving.com;
-    
-    location /.well-known/acme-challenge/ {
-        root /var/www/html;
-    }
-    
-    location / {
-        return 301 http://34.201.58.212$request_uri;
-    }
-}
-EOF
-
 # Create webroot directory
 mkdir -p /var/www/html/.well-known/acme-challenge
+
+# Copy SSL challenge configuration
+echo -e "${YELLOW}Setting up nginx configuration for SSL challenge...${NC}"
+cp /var/www/moving-full-app/nginx/conf.d/ssl-challenge.conf /etc/nginx/conf.d/
 
 # Test nginx configuration
 nginx -t
@@ -65,8 +52,7 @@ certbot certonly --webroot \
     --email admin@mooweemoving.com \
     --agree-tos \
     --no-eff-email \
-    -d mooweemoving.com \
-    -d www.mooweemoving.com
+    -d mooweemoving.com
 
 # Check if certificate was obtained successfully
 if [ $? -eq 0 ]; then
@@ -198,7 +184,7 @@ else
     # Cleanup
     systemctl stop nginx
     systemctl disable nginx
-    rm -f /etc/nginx/conf.d/mooweemoving.conf
+    rm -f /etc/nginx/conf.d/ssl-challenge.conf
     
     # Restart nginx container
     cd /var/www/moving-full-app
