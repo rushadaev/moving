@@ -19,8 +19,8 @@ services:
   nginx:
     image: nginx:alpine
     container_name: moving-nginx-1
-    expose:
-      - "80"
+    ports:
+      - "80:80"
     volumes:
       - ./nginx/conf.d/prod.conf:/etc/nginx/conf.d/default.conf
       - frontend_dist:/var/www/frontend
@@ -38,7 +38,6 @@ services:
     volumes:
       - ./backend:/var/www/html
       - backend_vendor:/var/www/html/vendor
-      - ./.env:/var/www/html/.env
     environment:
       - APP_NAME=${APP_NAME}
       - APP_ENV=${APP_ENV}
