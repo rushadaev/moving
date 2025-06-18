@@ -5,7 +5,6 @@ services:
       dockerfile: Dockerfile
     command: sh -c "npm run build && cp -r dist/* /var/www/frontend/"
     volumes:
-      - ./ssl:/etc/ssl
       - frontend_dist:/var/www/frontend
     networks:
       - app-network
@@ -14,11 +13,9 @@ services:
     image: nginx:alpine
     container_name: moving-nginx-1
     ports:
-      - "443:443"
       - "80:80"
       - "443:443"
     volumes:
-      - ./ssl:/etc/ssl
       - ./nginx/conf.d/prod.conf:/etc/nginx/conf.d/default.conf
       - frontend_dist:/var/www/frontend
       - ./backend/public:/var/www/backend
@@ -34,7 +31,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     volumes:
-      - ./ssl:/etc/ssl
       - ./backend:/var/www/html
       - backend_vendor:/var/www/html/vendor
       - ./.env:/var/www/html/.env
@@ -47,7 +43,6 @@ services:
   mysql:
     image: mysql:8.0
     ports:
-      - "443:443"
       - "3307:3306"
     environment:
       - MYSQL_DATABASE=${DB_DATABASE}
@@ -55,7 +50,6 @@ services:
       - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${DOCKER_MYSQL_ROOT_PASSWORD}
     volumes:
-      - ./ssl:/etc/ssl
       - mysql_data:/var/lib/mysql
     networks:
       - app-network
@@ -70,7 +64,6 @@ networks:
     driver: bridge
 
 volumes:
-      - ./ssl:/etc/ssl
   mysql_data:
   frontend_dist:
   backend_vendor: 
