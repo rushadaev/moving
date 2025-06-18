@@ -62,7 +62,7 @@
     <!-- Кнопки -->
     <div class="flex justify-center gap-4 m-4 w-full max-w-3xl">
       <button class="btn">GET QUOTE</button>
-      <button class="btn bg-green-500 text-white">LEAVE REQUEST</button>
+      <button class="btn bg-green-500 text-white" @click="handleLeaveRequest">LEAVE REQUEST</button>
       <button class="btn">PRICES</button>
     </div>
 
@@ -133,6 +133,19 @@ import facebookIcon from '@/assets/icons/Facebook.svg'
 import youtubeIcon from '@/assets/icons/YouTube.svg'
 import mailIcon from '@/assets/icons/Mail.svg'
 import phoneIcon from '@/assets/icons/Phone.svg'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+function handleLeaveRequest() {
+  if (!authStore.isAuthenticated) {
+    router.push('/auth')
+  } else {
+    router.push('/requests')
+  }
+}
 </script>
 
 <style scoped>

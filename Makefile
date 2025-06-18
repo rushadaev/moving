@@ -11,6 +11,7 @@ install:
 	docker-compose -f docker-compose.dev.yml exec backend composer install
 	make generate-key
 	docker-compose -f docker-compose.dev.yml exec backend php artisan migrate:fresh --seed
+	docker-compose -f docker-compose.dev.yml exec backend php artisan db:seed
 	docker-compose -f docker-compose.dev.yml exec frontend npm install
 
 # Development commands

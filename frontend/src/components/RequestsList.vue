@@ -5,6 +5,7 @@ import GradientButton from './ui/GradientButton.vue'
 import { useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
 import { useRequestsStore, type Request } from '../stores/requests'
+import { useAuthStore } from '../stores/auth'
 import { NButton } from 'naive-ui'
 
 const props = defineProps<{
@@ -13,6 +14,7 @@ const props = defineProps<{
 
 const router = useRouter()
 const requestsStore = useRequestsStore()
+const authStore = useAuthStore()
 const loading = ref(false)
 const showCreateModal = ref(false)
 
@@ -47,7 +49,10 @@ const showRequestDetails = async (item) => {
     console.error("Request has no ID")
     return
   }
-  
+  if (!authStore.isAuthenticated) {
+    router.push('/auth')
+    return
+  }
   console.log(`Attempting to navigate to details for request ID: ${item.id}`, item)
   
   try {
