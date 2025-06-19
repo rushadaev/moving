@@ -19,8 +19,8 @@ services:
       - ./nginx/conf.d/production.conf:/etc/nginx/conf.d/default.conf
       - frontend_dist:/var/www/frontend
       - ./backend:/var/www/backend
-      - /etc/letsencrypt/live/mooweemoving.com/fullchain.pem:/etc/letsencrypt/live/mooweemoving.com/fullchain.pem:ro
-      - /etc/letsencrypt/live/mooweemoving.com/privkey.pem:/etc/letsencrypt/live/mooweemoving.com/privkey.pem:ro
+      - ./ssl/mooweemoving.crt:/etc/nginx/ssl/mooweemoving.crt:ro
+      - ./ssl/mooweemoving.key:/etc/nginx/ssl/mooweemoving.key:ro
     depends_on:
       - frontend
       - backend
