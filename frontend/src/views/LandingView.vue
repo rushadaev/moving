@@ -62,7 +62,15 @@
     <!-- Кнопки -->
     <div class="flex justify-center gap-4 m-4 w-full max-w-3xl">
       <button class="btn">GET QUOTE</button>
-      <button class="btn bg-green-500 text-white" @click="handleLeaveRequest">LEAVE REQUEST</button>
+      <button 
+        class="btn bg-green-500 text-white hover:bg-green-600 cursor-pointer" 
+        @click="handleLeaveRequest"
+        @mousedown="handleLeaveRequest"
+        @touchstart="handleLeaveRequest"
+        type="button"
+      >
+        LEAVE REQUEST
+      </button>
       <button class="btn">PRICES</button>
     </div>
 
@@ -140,10 +148,25 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 function handleLeaveRequest() {
-  if (!authStore.isAuthenticated) {
-    router.push('/auth')
-  } else {
-    router.push('/requests')
+  console.log('LEAVE REQUEST button clicked!')
+  console.log('Auth store state:', {
+    isAuthenticated: authStore.isAuthenticated,
+    user: authStore.user,
+    token: authStore.token ? 'exists' : 'missing'
+  })
+  
+  try {
+    if (!authStore.isAuthenticated) {
+      console.log('User not authenticated, redirecting to /auth')
+      router.push('/auth')
+    } else {
+      console.log('User authenticated, redirecting to /requests')
+      router.push('/requests')
+    }
+  } catch (error) {
+    console.error('Error in handleLeaveRequest:', error)
+    // Fallback navigation
+    window.location.href = authStore.isAuthenticated ? '/requests' : '/auth'
   }
 }
 </script>
