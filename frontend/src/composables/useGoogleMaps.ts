@@ -29,16 +29,19 @@ export function useGoogleMaps() {
         return
       }
 
-      const script = document.createElement('script')
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`
-      script.async = true
-      script.defer = true
-
-      script.onload = () => {
+      // Create callback function for Google Maps
+      const callbackName = 'initGoogleMaps'
+      ;(window as any)[callbackName] = () => {
         isLoaded.value = true
         isLoading.value = false
         resolve()
+        delete (window as any)[callbackName]
       }
+
+      const script = document.createElement('script')
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places&callback=${callbackName}`
+      script.async = true
+      script.defer = true
 
       script.onerror = () => {
         isLoading.value = false

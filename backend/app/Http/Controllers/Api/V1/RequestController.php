@@ -37,7 +37,7 @@ class RequestController extends Controller
             'movers_count' => 'required|integer|min:1',
             'hourly_rate' => 'required|numeric|min:0',
             'departure_time' => 'required|date',
-            'labor_included' => 'required|boolean',
+            'labor_included' => 'nullable|boolean',
             'package_type' => 'nullable|string',
             'addresses' => 'required|array|min:2',
             'addresses.*.address' => 'required|string',

@@ -905,9 +905,6 @@ onUnmounted(() => {
   gap: 12px;
 }
 
-.take-break-button {
-  background: linear-gradient(90deg, #5D87EE 0%, #F97066 100%);
-}
 
 .secondary-buttons {
   display: grid;

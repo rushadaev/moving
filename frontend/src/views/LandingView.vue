@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center bg-blue-600">
+  <div class="min-h-screen mt-[-60px] flex flex-col items-center bg-[#144560]">
     <!-- Header -->
     <header class="p-6 flex flex-col items-center bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl m-4 w-full max-w-3xl border border-gray-400">
       <img :src="logoIcon" alt="Moowee Logo" class="w-24 mb-2" />
