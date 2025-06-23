@@ -189,7 +189,7 @@ const calculateRoute = async () => {
         const route = data.routes[0];
         
         // Decode and display the polyline
-        if (route.polyline?.encodedPolyline) {
+        if (route.polyline?.encodedPolyline && google.maps.geometry?.encoding) {
           const decodedPath = google.maps.geometry.encoding.decodePath(route.polyline.encodedPolyline);
           
           // Create a new polyline
