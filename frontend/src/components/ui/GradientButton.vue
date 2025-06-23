@@ -47,12 +47,12 @@ defineEmits(['click']);
   padding: 10px 20px;
   cursor: pointer;
   border: none;
-  background: linear-gradient(90deg, #004AFF 0%, #5D87EE 50%, #FF5400 100%);
-  box-shadow: 0px 4px 4px rgba(0, 55, 189, 0.25);
+  background: linear-gradient(90deg, #C0C0C0 0%, #E5E5E5 50%, #A8A8A8 100%);
+  box-shadow: 0px 4px 4px rgba(128, 128, 128, 0.25);
   border-radius: 8px;
   font-weight: 500;
   font-size: 14px;
-  color: white;
+  color: #333333;
   transition: all 0.2s ease;
   min-height: 36px;
 }
@@ -79,12 +79,12 @@ defineEmits(['click']);
 
 .gradient-button:hover:not(.disabled) {
   transform: translateY(-1px);
-  box-shadow: 0px 6px 6px rgba(0, 55, 189, 0.3);
+  box-shadow: 0px 6px 6px rgba(128, 128, 128, 0.3);
 }
 
 .gradient-button:active:not(.disabled) {
   transform: translateY(0);
-  box-shadow: 0px 2px 4px rgba(0, 55, 189, 0.2);
+  box-shadow: 0px 2px 4px rgba(128, 128, 128, 0.2);
 }
 
 .gradient-button.disabled {

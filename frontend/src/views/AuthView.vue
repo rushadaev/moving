@@ -22,6 +22,7 @@ const loginForm = ref({
 const registerForm = ref({
   name: '',
   email: '',
+  phone: '',
   password: '',
   password_confirmation: ''
 })
@@ -41,6 +42,7 @@ const isLoginValid = computed(() => {
 const isRegisterValid = computed(() => {
   return registerForm.value.name.trim() !== '' && 
          registerForm.value.email.trim() !== '' && 
+         registerForm.value.phone.trim() !== '' &&
          registerForm.value.password.trim() !== '' &&
          registerForm.value.password_confirmation.trim() !== '' &&
          registerForm.value.password === registerForm.value.password_confirmation
@@ -116,22 +118,22 @@ async function handleRegister() {
       <!-- Login Form -->
       <form v-if="isLogin" @submit.prevent="handleLogin" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1">Email</label>
+          <label class="block text-sm font-medium mb-1 text-gray-700">Email</label>
           <input 
             type="email" 
             v-model="loginForm.email" 
-            class="w-full p-2 border rounded" 
+            class="w-full p-2 border rounded text-gray-900 bg-white" 
             placeholder="you@example.com"
             required
           />
         </div>
         
         <div>
-          <label class="block text-sm font-medium mb-1">Password</label>
+          <label class="block text-sm font-medium mb-1 text-gray-700">Password</label>
           <input 
             type="password" 
             v-model="loginForm.password" 
-            class="w-full p-2 border rounded"
+            class="w-full p-2 border rounded text-gray-900 bg-white"
             placeholder="••••••••"
             required
           />
@@ -163,44 +165,55 @@ async function handleRegister() {
       <!-- Register Form -->
       <form v-else @submit.prevent="handleRegister" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1">Name</label>
+          <label class="block text-sm font-medium mb-1 text-gray-700">Name</label>
           <input 
             type="text" 
             v-model="registerForm.name" 
-            class="w-full p-2 border rounded" 
+            class="w-full p-2 border rounded text-gray-900 bg-white" 
             placeholder="Your Name"
             required
           />
         </div>
         
         <div>
-          <label class="block text-sm font-medium mb-1">Email</label>
+          <label class="block text-sm font-medium mb-1 text-gray-700">Email</label>
           <input 
             type="email" 
             v-model="registerForm.email" 
-            class="w-full p-2 border rounded" 
+            class="w-full p-2 border rounded text-gray-900 bg-white" 
             placeholder="you@example.com"
             required
           />
         </div>
         
         <div>
-          <label class="block text-sm font-medium mb-1">Password</label>
+          <label class="block text-sm font-medium mb-1 text-gray-700">Phone</label>
+          <input 
+            type="tel" 
+            v-model="registerForm.phone" 
+            class="w-full p-2 border rounded text-gray-900 bg-white" 
+            placeholder="+1 (123) 456-7890"
+            required
+          />
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium mb-1 text-gray-700">Password</label>
           <input 
             type="password" 
             v-model="registerForm.password" 
-            class="w-full p-2 border rounded"
+            class="w-full p-2 border rounded text-gray-900 bg-white"
             placeholder="••••••••"
             required
           />
         </div>
         
         <div>
-          <label class="block text-sm font-medium mb-1">Confirm Password</label>
+          <label class="block text-sm font-medium mb-1 text-gray-700">Confirm Password</label>
           <input 
             type="password" 
             v-model="registerForm.password_confirmation" 
-            class="w-full p-2 border rounded"
+            class="w-full p-2 border rounded text-gray-900 bg-white"
             placeholder="••••••••"
             required
           />

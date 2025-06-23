@@ -17,11 +17,11 @@
         </div>
 
         <div class="form-group">
-          <label>Square Feet</label>
+          <label>{{ formData.property_type === 'residential' ? 'Number of Bedrooms' : 'Square Feet' }}</label>
           <n-input-number
-            v-model:value="formData.square_feet"
+            v-model:value="formData.property_type === 'residential' ? formData.bedrooms : formData.square_feet"
             :min="0"
-            placeholder="Enter square feet"
+            :placeholder="formData.property_type === 'residential' ? 'Enter number of bedrooms' : 'Enter square feet'"
             style="width: 100%"
           />
         </div>
@@ -29,14 +29,40 @@
 
       <!-- Date & Time Full Width -->
       <div class="form-group full-width">
-        <label>Moving Date & Time</label>
+        <label>Moving Date</label>
         <n-date-picker
-          v-model:value="departureTimestamp"
-          type="datetime"
-          placeholder="Select date and time"
-          format="MM/dd/yyyy HH:mm"
+          v-model:value="departureDate"
+          type="date"
+          placeholder="Select date"
+          format="MM/dd/yyyy"
           style="width: 100%"
+          :is-date-disabled="isDateDisabled"
         />
+      </div>
+
+      <!-- Custom Time Picker -->
+      <div class="form-group full-width">
+        <label>Moving Time</label>
+        <div class="time-picker-container">
+          <n-select
+            v-model:value="timeData.hour"
+            :options="hourOptions"
+            placeholder="Hour"
+            style="width: 30%"
+          />
+          <n-select
+            v-model:value="timeData.minute"
+            :options="minuteOptions"
+            placeholder="Minutes"
+            style="width: 30%"
+          />
+          <n-select
+            v-model:value="timeData.period"
+            :options="periodOptions"
+            placeholder="AM/PM"
+            style="width: 30%"
+          />
+        </div>
       </div>
 
       <!-- Addresses Section -->
@@ -45,17 +71,19 @@
         
         <div class="form-group full-width">
           <label>Pickup Location</label>
-          <n-input
-            v-model:value="formData.addresses[0].address"
+          <AddressAutocomplete
+            v-model="formData.addresses[0].address"
             placeholder="Enter pickup address"
+            @placeSelected="handlePickupPlaceSelected"
           />
         </div>
 
         <div class="form-group full-width">
           <label>Delivery Location</label>
-          <n-input
-            v-model:value="formData.addresses[1].address"
+          <AddressAutocomplete
+            v-model="formData.addresses[1].address"
             placeholder="Enter delivery address"
+            @placeSelected="handleDeliveryPlaceSelected"
           />
         </div>
       </div>
@@ -75,32 +103,35 @@
         <div class="form-group">
           <label>Hourly Rate ($)</label>
           <n-input-number
-            v-model:value="formData.hourly_rate"
-            :min="0"
+            :value="calculatedHourlyRate"
+            :disabled="true"
             :precision="2"
             style="width: 100%"
           />
         </div>
       </div>
 
-      <!-- Package and Options Row -->
-      <div class="form-row">
-        <div class="form-group">
-          <label>Package Type</label>
-          <n-select
-            v-model:value="formData.package_type"
-            :options="packageTypeOptions"
-            placeholder="Select package"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Options</label>
-          <n-checkbox v-model:checked="formData.labor_included">
-            Labor included
-          </n-checkbox>
-        </div>
+      <!-- Packing Options -->
+      <div class="form-group full-width">
+        <label>Packing Options (Optional)</label>
+        <n-checkbox-group v-model:value="formData.packing_options">
+          <n-space>
+            <n-checkbox value="boxes" label="Boxes">
+              Boxes
+            </n-checkbox>
+            <n-checkbox value="bubble_wrap" label="Bubble Wrap">
+              Bubble Wrap
+            </n-checkbox>
+            <n-checkbox value="packing_tape" label="Packing Tape">
+              Packing Tape
+            </n-checkbox>
+            <n-checkbox value="full_service" label="Full Service Packing">
+              Full Service Packing
+            </n-checkbox>
+          </n-space>
+        </n-checkbox-group>
       </div>
+
     </div>
 
     <template #footer>
@@ -118,6 +149,7 @@ import { useRequestsStore } from '@/stores/requests'
 import { useMessage } from 'naive-ui'
 import Modal from '@/components/ui/Modal.vue'
 import GradientButton from '@/components/ui/GradientButton.vue'
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete.vue'
 import geocodingService from '@/services/geocoding.service'
 import routesService from '@/services/routes.service'
 import {
@@ -126,6 +158,7 @@ import {
   NInputNumber,
   NDatePicker,
   NCheckbox,
+  NCheckboxGroup,
   NRadioGroup,
   NRadioButton,
   NSpace,
@@ -150,17 +183,47 @@ const showModal = computed({
   set: (value) => emit('update:show', value)
 })
 
-const departureTimestamp = ref<number | null>(null)
+const departureDate = ref<number | null>(null)
+
+// Time picker data
+const timeData = ref({
+  hour: 12,
+  minute: '00',
+  period: 'PM'
+})
+
+// Time picker options
+const hourOptions = Array.from({length: 12}, (_, i) => ({
+  label: String(i + 1),
+  value: i + 1
+}))
+
+const minuteOptions = [
+  { label: '00', value: '00' },
+  { label: '15', value: '15' },
+  { label: '30', value: '30' },
+  { label: '45', value: '45' }
+]
+
+const periodOptions = [
+  { label: 'AM', value: 'AM' },
+  { label: 'PM', value: 'PM' }
+]
+
+// Calculate hourly rate based on number of movers
+const calculatedHourlyRate = computed(() => {
+  const baseRate = 50 // Base rate per mover
+  return formData.value.movers_count * baseRate
+})
 
 const formData = ref({
   property_type: 'residential',
   square_feet: 1000,
+  bedrooms: 2,
   additional_objects: [],
   movers_count: 2,
   hourly_rate: 100,
   departure_time: '',
-  labor_included: true,
-  package_type: 'standard',
   addresses: [
     {
       address: '',
@@ -177,7 +240,8 @@ const formData = ref({
       longitude: 0
     }
   ],
-  materials: []
+  materials: [],
+  packing_options: []
 })
 
 const propertyTypeOptions = [
@@ -185,29 +249,44 @@ const propertyTypeOptions = [
   { label: 'Commercial', value: 'commercial' }
 ]
 
-const packageTypeOptions = [
-  { label: 'Basic Package', value: 'basic' },
-  { label: 'Standard Package', value: 'standard' },
-  { label: 'Premium Package', value: 'premium' }
-]
 
-// Convert timestamp to ISO string for departure_time
-watch(departureTimestamp, (newValue) => {
-  if (newValue) {
-    formData.value.departure_time = new Date(newValue).toISOString()
+// Convert date and time to ISO string for departure_time
+watch([departureDate, timeData], ([newDate, newTime]) => {
+  if (newDate) {
+    const date = new Date(newDate)
+    let hour = newTime.hour
+    
+    // Convert to 24-hour format
+    if (newTime.period === 'PM' && hour !== 12) {
+      hour += 12
+    } else if (newTime.period === 'AM' && hour === 12) {
+      hour = 0
+    }
+    
+    date.setHours(hour)
+    date.setMinutes(parseInt(newTime.minute))
+    date.setSeconds(0)
+    
+    formData.value.departure_time = date.toISOString()
   }
-})
+}, { deep: true })
+
+// Disable past dates
+const isDateDisabled = (timestamp: number) => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return timestamp < today.getTime()
+}
 
 const resetForm = () => {
   formData.value = {
     property_type: 'residential',
     square_feet: 1000,
+    bedrooms: 2,
     additional_objects: [],
     movers_count: 2,
     hourly_rate: 100,
     departure_time: '',
-    labor_included: true,
-    package_type: 'standard',
     addresses: [
       {
         address: '',
@@ -224,14 +303,37 @@ const resetForm = () => {
         longitude: 0
       }
     ],
-    materials: []
+    materials: [],
+  packing_options: []
   }
-  departureTimestamp.value = null
+  departureDate.value = null
+  timeData.value = {
+    hour: 12,
+    minute: '00',
+    period: 'PM'
+  }
 }
 
 const closeModal = () => {
   showModal.value = false
   resetForm()
+}
+
+// Handle place selection from Google Maps autocomplete
+const handlePickupPlaceSelected = (place: any) => {
+  if (place.geometry && place.geometry.location) {
+    formData.value.addresses[0].latitude = place.geometry.location.lat()
+    formData.value.addresses[0].longitude = place.geometry.location.lng()
+    formData.value.addresses[0].address = place.formatted_address
+  }
+}
+
+const handleDeliveryPlaceSelected = (place: any) => {
+  if (place.geometry && place.geometry.location) {
+    formData.value.addresses[1].latitude = place.geometry.location.lat()
+    formData.value.addresses[1].longitude = place.geometry.location.lng()
+    formData.value.addresses[1].address = place.formatted_address
+  }
 }
 
 const validateForm = () => {
@@ -259,41 +361,45 @@ const createRequest = async () => {
 
   loading.value = true
   try {
-    // Geocode addresses first
-    const pickupAddress = formData.value.addresses[0].address;
-    const deliveryAddress = formData.value.addresses[1].address;
+    // Geocode addresses if not already geocoded by autocomplete
+    const pickupAddress = formData.value.addresses[0];
+    const deliveryAddress = formData.value.addresses[1];
     
-    message.info('Geocoding addresses...')
-    
-    // Geocode pickup location
-    const pickupGeocode = await geocodingService.geocodeAddress(pickupAddress);
-    if (pickupGeocode) {
-      formData.value.addresses[0].latitude = pickupGeocode.latitude;
-      formData.value.addresses[0].longitude = pickupGeocode.longitude;
-      formData.value.addresses[0].address = pickupGeocode.formattedAddress;
-    } else {
-      message.error('Could not find pickup location');
-      loading.value = false;
-      return;
+    // Check if pickup location needs geocoding
+    if (!pickupAddress.latitude || !pickupAddress.longitude) {
+      message.info('Geocoding pickup address...')
+      const pickupGeocode = await geocodingService.geocodeAddress(pickupAddress.address);
+      if (pickupGeocode) {
+        formData.value.addresses[0].latitude = pickupGeocode.latitude;
+        formData.value.addresses[0].longitude = pickupGeocode.longitude;
+        formData.value.addresses[0].address = pickupGeocode.formattedAddress;
+      } else {
+        message.error('Could not find pickup location');
+        loading.value = false;
+        return;
+      }
     }
     
-    // Geocode delivery location
-    const deliveryGeocode = await geocodingService.geocodeAddress(deliveryAddress);
-    if (deliveryGeocode) {
-      formData.value.addresses[1].latitude = deliveryGeocode.latitude;
-      formData.value.addresses[1].longitude = deliveryGeocode.longitude;
-      formData.value.addresses[1].address = deliveryGeocode.formattedAddress;
-    } else {
-      message.error('Could not find delivery location');
-      loading.value = false;
-      return;
+    // Check if delivery location needs geocoding
+    if (!deliveryAddress.latitude || !deliveryAddress.longitude) {
+      message.info('Geocoding delivery address...')
+      const deliveryGeocode = await geocodingService.geocodeAddress(deliveryAddress.address);
+      if (deliveryGeocode) {
+        formData.value.addresses[1].latitude = deliveryGeocode.latitude;
+        formData.value.addresses[1].longitude = deliveryGeocode.longitude;
+        formData.value.addresses[1].address = deliveryGeocode.formattedAddress;
+      } else {
+        message.error('Could not find delivery location');
+        loading.value = false;
+        return;
+      }
     }
     
     // Calculate distance in miles
     message.info('Calculating distance...')
     const routeInfo = await routesService.calculateRoute(
-      { lat: pickupGeocode.latitude, lng: pickupGeocode.longitude },
-      { lat: deliveryGeocode.latitude, lng: deliveryGeocode.longitude }
+      { lat: formData.value.addresses[0].latitude, lng: formData.value.addresses[0].longitude },
+      { lat: formData.value.addresses[1].latitude, lng: formData.value.addresses[1].longitude }
     );
     
     let distanceMiles = 0;
@@ -302,10 +408,39 @@ const createRequest = async () => {
       console.log('Calculated distance:', distanceMiles, 'miles');
     }
     
-    // Add distance to form data
+    // Prepare packing prices (example prices - adjust as needed)
+    const packingPrices = {
+      boxes: 5, // $5 per box
+      bubble_wrap: 10, // $10 for bubble wrap
+      packing_tape: 3, // $3 for packing tape
+      full_service: 200 // $200 for full service packing
+    };
+    
+    // Calculate selected packing cost
+    const selectedPackingCost = formData.value.packing_options.reduce((total, option) => {
+      return total + (packingPrices[option as keyof typeof packingPrices] || 0);
+    }, 0);
+    
+    // Calculate travel cost (example: $2 per mile)
+    const travelCost = distanceMiles * 2;
+    
+    // Add distance and calculated values to form data
     const requestData = {
       ...formData.value,
-      distance: distanceMiles
+      hourly_rate: calculatedHourlyRate.value,
+      distance: distanceMiles,
+      // Additional data for backend email
+      pricing_details: {
+        hourly_rate: calculatedHourlyRate.value,
+        travel_cost: travelCost,
+        selected_packing_options: formData.value.packing_options,
+        packing_cost: selectedPackingCost,
+        packing_prices: packingPrices,
+        distance_miles: distanceMiles,
+        movers_count: formData.value.movers_count,
+        estimated_hours: 3, // Default estimate - backend can adjust
+        estimated_total: (calculatedHourlyRate.value * 3) + travelCost + selectedPackingCost
+      }
     };
     
     const result = await requestsStore.createRequest(requestData)
@@ -374,7 +509,12 @@ label {
   line-height: 1.5;
 }
 
-/* Remove radio button styles since we're using select now */
+.time-picker-container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
 
 @media (max-width: 640px) {
   .form-container {
