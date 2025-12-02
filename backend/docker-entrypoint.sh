@@ -15,8 +15,5 @@ fi
 # Run migrations
 php artisan migrate --force
 
-# Create symlink to root .env file
-ln -sf /.env /var/www/html/.env
-
 # Start PHP-FPM
 php-fpm 
