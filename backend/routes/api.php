@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\RequestController;
 use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\LandingPageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,14 @@ use App\Http\Controllers\Api\V1\PaymentController;
 Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
+});
+
+// Landing page routes (public)
+Route::prefix('landing')->group(function () {
+    Route::get('/', [LandingPageController::class, 'index']);
+    Route::get('/settings', [LandingPageController::class, 'settings']);
+    Route::get('/services', [LandingPageController::class, 'services']);
+    Route::get('/reviews', [LandingPageController::class, 'reviews']);
 });
 
 // Protected routes

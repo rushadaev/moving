@@ -28,15 +28,6 @@ server {
 
     # Root directory for frontend (default)
     root /var/www/moving-frontend;
-    index index.html;
-
-    # Storage files - uploaded images
-    location ^~ /storage/ {
-        root /var/www/moving-backend/public;
-        try_files $uri =404;
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
 
     # API routes - Laravel backend
     location ^~ /api/ {
@@ -50,7 +41,7 @@ server {
         try_files $uri $uri/ /index.php?$query_string;
     }
 
-    # Filament CSS/JS assets from backend
+    # Filament CSS/JS assets
     location ^~ /css/ {
         root /var/www/moving-backend/public;
         try_files $uri =404;
@@ -88,9 +79,21 @@ server {
         include fastcgi_params;
     }
 
+    # Explicit handling for root path
+    location = / {
+        add_header X-Content-Type-Options nosniff;
+        try_files /index.html =404;
+    }
+
+    # Explicit handling for index.html
+    location = /index.html {
+        add_header X-Content-Type-Options nosniff;
+    }
+
     # Frontend SPA - Vue.js application (catch-all, MUST be last)
     location / {
         add_header X-Content-Type-Options nosniff;
+        try_files $uri $uri/ =404;
     }
 
     # Cache static assets
@@ -135,14 +138,6 @@ server {
     # Root directory for frontend (default)
     root /var/www/alexbuild-frontend;
     index index.html;
-
-    # Storage files - uploaded images
-    location ^~ /storage/ {
-        root /var/www/alexbuild-backend/public;
-        try_files $uri =404;
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
 
     # API routes - Laravel backend
     location ^~ /api/ {

@@ -1,141 +1,134 @@
 <template>
   <div class="min-h-screen mt-[-60px] flex flex-col items-center bg-[#144560]">
-    <!-- Header -->
-    <header class="p-6 flex flex-col items-center bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl m-4 w-full max-w-3xl border border-gray-400">
-      <img :src="logoIcon" alt="Moowee Logo" class="w-24 mb-2" />
-      <h1 class="text-2xl font-bold text-gray-800">MOOWEE</h1>
-      <p class="text-center text-gray-800 mt-2 font-semibold">More than a moving company — we're your moving partner</p>
-      <p class="text-xs text-gray-700 mt-1">Moowee is your trusted partner for stress-free moves.<br>
-        We specialize in residential, commercial, and local moving services, delivering reliability, care, and professionalism with every box we lift. Whether you're relocating your home, office, or apartment, Moowee gets you there — smoothly, safely, and on time.
-      </p>
-    </header>
-
-    <!-- Services Grid -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 m-4 w-full max-w-3xl">
-      <div class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400">
-        <img :src="residentMovingIcon" alt="Residential Moving" class="w-10 h-10 mb-2" />
-        <div class="font-bold mt-2 text-gray-800">RESIDENTIAL MOVING</div>
-        <div class="text-xs text-center text-gray-700">Apartment moving<br>House moving</div>
-      </div>
-      <div class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400">
-        <img :src="commercialMovingIcon" alt="Commercial Moving" class="w-10 h-10 mb-2" />
-        <div class="font-bold mt-2 text-gray-800">COMMERCIAL MOVING</div>
-        <div class="text-xs text-center text-gray-700">Corporate relocations<br>Office relocations</div>
-      </div>
-      <div class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400">
-        <img :src="packingIcon" alt="Packing Service" class="w-10 h-10 mb-2" />
-        <div class="font-bold mt-2 text-gray-800">PACKING SERVICE</div>
-        <div class="text-xs text-center text-gray-700">Packing service<br>Packing supplies<br>Unpacking services</div>
-      </div>
-      <div class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400">
-        <img :src="storagingIcon" alt="Storage Solution" class="w-10 h-10 mb-2" />
-        <div class="font-bold mt-2 text-gray-800">STORAGE SOLUTION</div>
-        <div class="text-xs text-center text-gray-700">Short-term storage<br>Long-term storage</div>
-      </div>
-      <div class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400">
-        <img :src="pianoIcon" alt="Special Movings" class="w-10 h-10 mb-2" />
-        <div class="font-bold mt-2 text-gray-800">SPECIAL MOVINGS</div>
-        <div class="text-xs text-center text-gray-700">Piano moving<br>Antique handling<br>Artwork and fragile items</div>
-      </div>
-      <div class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400">
-        <img :src="laborIcon" alt="Labor Services" class="w-10 h-10 mb-2" />
-        <div class="font-bold mt-2 text-gray-800">LABOR SERVICES</div>
-        <div class="text-xs text-center text-gray-700">Loading and unloading services<br>Furniture assembly and disassembly<br>Handyman service</div>
-      </div>
-      <div class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400">
-        <img :src="cleaningIcon" alt="Cleaning Services" class="w-10 h-10 mb-2" />
-        <div class="font-bold mt-2 text-gray-800">CLEANING SERVICES</div>
-        <div class="text-xs text-center text-gray-700">Pre-move cleaning<br>Post-move cleaning<br>Deep cleaning</div>
-      </div>
-      <div class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400">
-        <img :src="lastCallIcon" alt="Last Minute Services" class="w-10 h-10 mb-2" />
-        <div class="font-bold mt-2 text-gray-800">LAST MINUTE SERVICES</div>
-        <div class="text-xs text-center text-gray-700">Emergency moving services<br>Same-day moving options</div>
-      </div>
-      <div class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400">
-        <img :src="insuranceIcon" alt="Insurance" class="w-10 h-10 mb-2" />
-        <div class="font-bold mt-2 text-gray-800">INSURANCE</div>
-        <div class="text-xs text-center text-gray-700">Basic coverage<br>Full value protection<br>Additional insurance options</div>
-      </div>
-    </section>
-
-    <!-- Кнопки -->
-    <div class="flex justify-center gap-4 m-4 w-full max-w-3xl">
-      <button class="btn">GET QUOTE</button>
-      <button 
-        class="btn bg-green-500 text-white hover:bg-green-600 cursor-pointer" 
-        @click="handleLeaveRequest"
-        @mousedown="handleLeaveRequest"
-        @touchstart="handleLeaveRequest"
-        type="button"
-      >
-        LEAVE REQUEST
-      </button>
-      <button class="btn">PRICES</button>
+    <!-- Loading state -->
+    <div v-if="loading" class="flex items-center justify-center min-h-screen">
+      <div class="text-white text-xl">Loading...</div>
     </div>
 
-    <!-- Фото -->
-    <section class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl m-4 p-4 flex flex-col items-center w-full max-w-3xl border border-gray-400">
-      <h2 class="font-bold text-xl mb-2 text-gray-800">Unloaded photo</h2>
-      <img src="https://placehold.co/400x400?text=Photo" alt="Unloaded photo" class="rounded-lg w-full max-w-md" />
-    </section>
+    <template v-else>
+      <!-- Header -->
+      <header class="p-6 flex flex-col items-center bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl m-4 w-full max-w-3xl border border-gray-400">
+        <img :src="getImageUrl(settings?.logo) || logoIcon" alt="Company Logo" class="w-24 mb-2" />
+        <h1 class="text-2xl font-bold text-gray-800">{{ settings?.company_name || 'MOOWEE' }}</h1>
+        <p v-if="settings?.tagline" class="text-center text-gray-800 mt-2 font-semibold">{{ settings.tagline }}</p>
+        <p v-if="settings?.description" class="text-xs text-gray-700 mt-1" v-html="settings.description"></p>
+      </header>
 
-    <!-- Видео -->
-    <section class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl m-4 p-4 flex flex-col items-center w-full max-w-3xl border border-gray-400">
-      <h2 class="font-bold text-xl mb-2 text-gray-800">Unloaded video</h2>
-      <video controls class="rounded-lg w-full max-w-md">
-        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
-      </video>
-    </section>
-
-    <!-- Отзывы -->
-    <section class="flex flex-row justify-center gap-2 m-4 w-full max-w-3xl overflow-x-auto">
-      <div v-for="i in 5" :key="i" class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 min-w-[200px] shadow border border-gray-400">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="text-yellow-400">★</span>
-          <span class="text-yellow-400">★</span>
-          <span class="text-yellow-400">★</span>
-          <span class="text-yellow-400">★</span>
-          <span class="text-yellow-400">★</span>
+      <!-- Services Grid -->
+      <section v-if="services.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-4 m-4 w-full max-w-3xl">
+        <div
+          v-for="service in services"
+          :key="service.id"
+          class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 flex flex-col items-center shadow border border-gray-400"
+        >
+          <img
+            :src="getImageUrl(service.icon)"
+            :alt="service.title"
+            class="w-10 h-10 mb-2 object-contain"
+          />
+          <div class="font-bold mt-2 text-gray-800">{{ service.title }}</div>
+          <div class="text-xs text-center text-gray-700" v-html="service.description"></div>
         </div>
-        <div class="text-xs text-gray-700">"Great service! Highly recommend."</div>
-        <div class="text-xs mt-2 font-bold text-gray-800">— Customer {{ i }}</div>
+      </section>
+
+      <!-- Кнопки -->
+      <div class="flex justify-center gap-4 m-4 w-full max-w-3xl">
+        <button class="btn">GET QUOTE</button>
+        <button
+          class="btn bg-green-500 text-white hover:bg-green-600 cursor-pointer"
+          @click="handleLeaveRequest"
+          @mousedown="handleLeaveRequest"
+          @touchstart="handleLeaveRequest"
+          type="button"
+        >
+          LEAVE REQUEST
+        </button>
+        <button class="btn">PRICES</button>
       </div>
-    </section>
 
-    <!-- Контакты -->
-    <footer class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl m-4 p-4 text-gray-800 w-full max-w-3xl border border-gray-400">
-      <h2 class="font-bold text-xl">Contacts</h2>
-      <div class="flex flex-col gap-1 mt-2">
-        <div class="flex items-center gap-2">
-          <img :src="phoneIcon" alt="Phone" class="w-5 h-5" />
-          <span>+1(310) 753-42-48</span>
+      <!-- Фото -->
+      <section
+        v-if="settings?.photo_url"
+        class="rounded-xl m-4 p-4 flex flex-col items-center w-full max-w-3xl"
+      >
+        <h2 class="font-bold text-xl mb-2 text-white">{{ settings?.photo_title || 'Unloaded photo' }}</h2>
+        <img :src="getImageUrl(settings.photo_url)" :alt="settings.photo_title" class="rounded-lg w-full max-w-md" />
+      </section>
+
+      <!-- Видео -->
+      <section
+        v-if="settings?.video_url"
+        class="rounded-xl m-4 p-4 flex flex-col items-center w-full max-w-3xl"
+      >
+        <h2 class="font-bold text-xl mb-2 text-white">{{ settings?.video_title || 'Unloaded video' }}</h2>
+        <!-- YouTube/Embedded video -->
+        <iframe
+          v-if="isYouTubeOrEmbedUrl(settings.video_url)"
+          :src="getVideoEmbedUrl(settings.video_url)"
+          class="rounded-lg w-full max-w-md aspect-video"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+        <!-- Direct video file -->
+        <video v-else controls class="rounded-lg w-full max-w-md">
+          <source :src="settings.video_url" type="video/mp4" />
+        </video>
+      </section>
+
+      <!-- Отзывы -->
+      <section v-if="reviews.length > 0" class="flex flex-row justify-center gap-2 m-4 w-full max-w-3xl overflow-x-auto">
+        <div
+          v-for="review in reviews"
+          :key="review.id"
+          class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl p-4 min-w-[200px] shadow border border-gray-400"
+        >
+          <div class="flex items-center gap-1 mb-2">
+            <span
+              v-for="(filled, index) in getStars(review.rating)"
+              :key="index"
+              :class="filled ? 'text-yellow-400' : 'text-gray-400'"
+            >
+              ★
+            </span>
+          </div>
+          <div class="text-xs text-gray-700">"{{ review.review_text }}"</div>
+          <div class="text-xs mt-2 font-bold text-gray-800">— {{ review.customer_name }}</div>
         </div>
-        <div class="flex items-center gap-2">
-          <img :src="mailIcon" alt="Mail" class="w-5 h-5" />
-          <span>mooweemoving@gmail.com</span>
+      </section>
+
+      <!-- Контакты -->
+      <footer class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl m-4 p-4 text-gray-800 w-full max-w-3xl border border-gray-400">
+        <h2 class="font-bold text-xl">Contacts</h2>
+        <div class="flex flex-col gap-1 mt-2">
+          <div v-if="settings?.phone" class="flex items-center gap-2">
+            <img :src="phoneIcon" alt="Phone" class="w-5 h-5" />
+            <span>{{ settings.phone }}</span>
+          </div>
+          <div v-if="settings?.email" class="flex items-center gap-2">
+            <img :src="mailIcon" alt="Mail" class="w-5 h-5" />
+            <span>{{ settings.email }}</span>
+          </div>
+          <div class="flex gap-2 mt-2">
+            <a v-if="settings?.instagram_url" :href="settings.instagram_url" target="_blank" class="icon flex items-center gap-1">
+              <img :src="instagramIcon" alt="Instagram" class="w-5 h-5" />Instagram
+            </a>
+            <a v-if="settings?.facebook_url" :href="settings.facebook_url" target="_blank" class="icon flex items-center gap-1">
+              <img :src="facebookIcon" alt="Facebook" class="w-5 h-5" />Facebook
+            </a>
+            <a v-if="settings?.youtube_url" :href="settings.youtube_url" target="_blank" class="icon flex items-center gap-1">
+              <img :src="youtubeIcon" alt="YouTube" class="w-5 h-5" />YouTube
+            </a>
+          </div>
         </div>
-        <div class="flex gap-2 mt-2">
-          <a href="#" class="icon flex items-center gap-1"><img :src="instagramIcon" alt="Instagram" class="w-5 h-5" />Instagram</a>
-          <a href="#" class="icon flex items-center gap-1"><img :src="facebookIcon" alt="Facebook" class="w-5 h-5" />Facebook</a>
-          <a href="#" class="icon flex items-center gap-1"><img :src="youtubeIcon" alt="YouTube" class="w-5 h-5" />YouTube</a>
-        </div>
-      </div>
-    </footer>
+      </footer>
+    </template>
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import logoIcon from '@/assets/icons/Logo.svg'
-import residentMovingIcon from '@/assets/icons/Resident Moving.svg'
-import commercialMovingIcon from '@/assets/icons/Commercial Moving.svg'
-import packingIcon from '@/assets/icons/Packing.svg'
-import storagingIcon from '@/assets/icons/Storaging.svg'
-import pianoIcon from '@/assets/icons/Piano.svg'
-import laborIcon from '@/assets/icons/Labor.svg'
-import cleaningIcon from '@/assets/icons/Cleaning.svg'
-import lastCallIcon from '@/assets/icons/Last call.svg'
-import insuranceIcon from '@/assets/icons/Insurance.svg'
 import instagramIcon from '@/assets/icons/Instagram.svg'
 import facebookIcon from '@/assets/icons/Facebook.svg'
 import youtubeIcon from '@/assets/icons/YouTube.svg'
@@ -147,6 +140,75 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
+// Reactive state for landing page data
+const settings = ref(null)
+const services = ref([])
+const reviews = ref([])
+const loading = ref(true)
+
+// Fetch landing page data from API
+async function fetchLandingData() {
+  try {
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://mooweemoving.com/api'
+    const response = await fetch(`${apiUrl}/landing`)
+    const data = await response.json()
+
+    settings.value = data.settings
+    services.value = data.services
+    reviews.value = data.reviews
+
+    console.log('Landing page data loaded:', data)
+  } catch (error) {
+    console.error('Error loading landing page data:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Get full URL for uploaded images
+function getImageUrl(path) {
+  if (!path) return null
+  if (path.startsWith('http')) return path
+  const baseUrl = 'https://mooweemoving.com'
+  return `${baseUrl}/storage/${path}`
+}
+
+// Detect if URL is YouTube or embed video
+function isYouTubeOrEmbedUrl(url) {
+  if (!url) return false
+  return url.includes('youtube.com') ||
+         url.includes('youtu.be') ||
+         url.includes('embed')
+}
+
+// Convert YouTube watch URL to embed URL
+function getVideoEmbedUrl(url) {
+  if (!url) return null
+
+  // Already an embed URL
+  if (url.includes('/embed/')) return url
+
+  // Convert youtube.com/watch?v=VIDEO_ID to youtube.com/embed/VIDEO_ID
+  if (url.includes('youtube.com/watch')) {
+    const videoId = url.split('v=')[1]?.split('&')[0]
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`
+  }
+
+  // Convert youtu.be/VIDEO_ID to youtube.com/embed/VIDEO_ID
+  if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1]?.split('?')[0]
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`
+  }
+
+  // Return original URL if no conversion needed
+  return url
+}
+
+// Generate star rating
+function getStars(rating) {
+  return Array(5).fill(0).map((_, i) => i < rating)
+}
+
 function handleLeaveRequest() {
   console.log('LEAVE REQUEST button clicked!')
   console.log('Auth store state:', {
@@ -154,7 +216,7 @@ function handleLeaveRequest() {
     user: authStore.user,
     token: authStore.token ? 'exists' : 'missing'
   })
-  
+
   try {
     if (!authStore.isAuthenticated) {
       console.log('User not authenticated, redirecting to /auth')
@@ -165,10 +227,13 @@ function handleLeaveRequest() {
     }
   } catch (error) {
     console.error('Error in handleLeaveRequest:', error)
-    // Fallback navigation
     window.location.href = authStore.isAuthenticated ? '/requests' : '/auth'
   }
 }
+
+onMounted(() => {
+  fetchLandingData()
+})
 </script>
 
 <style scoped>
