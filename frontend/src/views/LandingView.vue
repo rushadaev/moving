@@ -49,18 +49,18 @@
       <!-- Фото -->
       <section
         v-if="settings?.photo_url"
-        class="rounded-xl m-4 p-4 flex flex-col items-center w-full max-w-3xl"
+        class="bg-gradient-to-b from-gray-600 via-gray-300 to-gray-600 rounded-xl m-4 p-4 flex flex-col items-center w-full max-w-3xl border border-gray-500 shadow-lg"
       >
-        <h2 class="font-bold text-xl mb-2 text-white">{{ settings?.photo_title || 'Unloaded photo' }}</h2>
+        <h2 class="font-bold text-xl mb-2 text-gray-800">{{ settings?.photo_title || 'Unloaded photo' }}</h2>
         <img :src="getImageUrl(settings.photo_url)" :alt="settings.photo_title" class="rounded-lg w-full max-w-md" />
       </section>
 
       <!-- Видео -->
       <section
         v-if="settings?.video_url"
-        class="rounded-xl m-4 p-4 flex flex-col items-center w-full max-w-3xl"
+        class="bg-gradient-to-b from-gray-600 via-gray-300 to-gray-600 rounded-xl m-4 p-4 flex flex-col items-center w-full max-w-3xl border border-gray-500 shadow-lg"
       >
-        <h2 class="font-bold text-xl mb-2 text-white">{{ settings?.video_title || 'Unloaded video' }}</h2>
+        <h2 class="font-bold text-xl mb-2 text-gray-800">{{ settings?.video_title || 'Unloaded video' }}</h2>
         <!-- YouTube/Embedded video -->
         <iframe
           v-if="isYouTubeOrEmbedUrl(settings.video_url)"
