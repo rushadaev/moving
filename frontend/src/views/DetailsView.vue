@@ -82,6 +82,9 @@ onMounted(async () => {
       
       // Initialize form with existing data
       const sr = requestsStore.selectedRequest
+      console.log('Loading request data:', sr)
+      console.log('Original addresses from API:', sr.addresses)
+
       formData.value = {
         property_type: sr.property_type || 'residential',
         square_feet: sr.square_feet || 1000,
@@ -91,24 +94,39 @@ onMounted(async () => {
         departure_time: sr.departure_time || '',
         bedrooms: sr.bedrooms || 2,
         packing_options: sr.packing_options || [],
-        addresses: sr.addresses && sr.addresses.length > 0 ? [...sr.addresses] : [
-          {
-            address: '',
-            type: 'loading',
-            order: 0,
-            latitude: 0,
-            longitude: 0
-          },
-          {
-            address: '',
-            type: 'unloading',
-            order: 1,
-            latitude: 0,
-            longitude: 0
-          }
-        ],
+        addresses: sr.addresses && sr.addresses.length > 0
+          ? sr.addresses.map(addr => {
+              console.log('Processing address:', addr)
+              console.log('location_type value:', addr.location_type, 'type:', typeof addr.location_type)
+              return {
+                ...addr,
+                // Keep location_type as is (including null)
+                location_type: addr.location_type
+              }
+            })
+          : [
+              {
+                address: '',
+                type: 'loading',
+                location_type: null,
+                order: 0,
+                latitude: 0,
+                longitude: 0
+              },
+              {
+                address: '',
+                type: 'unloading',
+                location_type: null,
+                order: 1,
+                latitude: 0,
+                longitude: 0
+              }
+            ],
         materials: sr.materials || []
       }
+
+      console.log('Form data after initialization:', formData.value)
+      console.log('Processed addresses:', formData.value.addresses)
     }
   } catch (err) {
     console.error('Error loading request:', err)
@@ -118,19 +136,32 @@ onMounted(async () => {
   }
 })
 
+// Helper to log data before sending to API
+const prepareDataForApi = (data: any) => {
+  console.log('Preparing data for API:', data)
+  console.log('Addresses with location_type:', data.addresses.map((a: any) => ({
+    address: a.address,
+    type: a.type,
+    location_type: a.location_type
+  })))
+  // No conversion needed - null is valid for JSON
+  return data
+}
+
 const saveRequest = async () => {
   if (!validateForm()) return
-  
+
   saving.value = true
-  
+
   try {
     if (isEditing.value && requestsStore.selectedRequest?.id) {
       // Update existing request
+      const preparedData = prepareDataForApi(formData.value)
       const result = await requestsStore.updateRequest(
         requestsStore.selectedRequest.id,
-        formData.value
+        preparedData
       )
-      
+
       if (result) {
         message.success('Request updated successfully!')
         router.push('/requests')

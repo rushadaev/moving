@@ -77,26 +77,94 @@
 
     <!-- Addresses Section -->
     <div class="form-section">
-      <h4 class="section-title">Addresses</h4>
-      
-      <div class="form-group full-width">
-        <label>Pickup Location</label>
-        <AddressAutocomplete
-          :model-value="formData.addresses[0].address"
-          @update:model-value="updateAddress(0, 'address', $event)"
-          placeholder="Enter pickup address"
-          @placeSelected="handlePickupPlaceSelected"
-        />
+      <div class="section-header">
+        <h4 class="section-title">Addresses</h4>
+        <small class="section-subtitle">Add pickup, delivery, and optional stops</small>
       </div>
 
-      <div class="form-group full-width">
-        <label>Delivery Location</label>
-        <AddressAutocomplete
-          :model-value="formData.addresses[1].address"
-          @update:model-value="updateAddress(1, 'address', $event)"
-          placeholder="Enter delivery address"
-          @placeSelected="handleDeliveryPlaceSelected"
-        />
+      <!-- Dynamic Address List -->
+      <div
+        v-for="(address, index) in formData.addresses"
+        :key="index"
+        class="address-card"
+      >
+        <div class="address-card-header">
+          <div class="address-number">
+            <span class="number-badge">{{ index + 1 }}</span>
+            <span class="address-label">{{ getAddressLabel(index) }}</span>
+          </div>
+
+          <!-- Remove button (only for intermediate) -->
+          <n-button
+            v-if="address.type === 'intermediate'"
+            @click="removeAddress(index)"
+            text
+            type="error"
+            size="small"
+          >
+            <template #icon>
+              <n-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></n-icon>
+            </template>
+          </n-button>
+        </div>
+
+        <div class="address-card-content">
+          <!-- Address Autocomplete -->
+          <div class="form-group full-width">
+            <label>Address</label>
+            <AddressAutocomplete
+              :model-value="address.address"
+              @update:model-value="updateAddress(index, 'address', $event)"
+              :placeholder="`Enter ${getAddressLabel(index).toLowerCase()}`"
+              @placeSelected="(place) => handlePlaceSelected(index, place)"
+            />
+          </div>
+
+          <!-- Action Type & Location Type Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Action Type</label>
+              <n-select
+                :value="address.type"
+                @update:value="(value) => {
+                  console.log('Action type changed for address', index, 'to', value)
+                  updateAddress(index, 'type', value)
+                }"
+                :options="actionTypeOptions"
+                placeholder="Select action"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Location Type <span class="optional-text">(Optional)</span></label>
+              <n-select
+                :value="address.location_type"
+                @update:value="(value) => {
+                  console.log('Location type changed for address', index, 'to', value)
+                  updateAddress(index, 'location_type', value)
+                }"
+                :options="locationTypeOptions"
+                placeholder="Select type"
+                clearable
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Intermediate Button -->
+      <div class="add-address-container">
+        <n-button
+          @click="addIntermediateAddress"
+          dashed
+          block
+          type="primary"
+        >
+          <template #icon>
+            <n-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></n-icon>
+          </template>
+          Add Intermediate Stop
+        </n-button>
       </div>
     </div>
 
@@ -160,7 +228,9 @@ import {
   NDatePicker,
   NCheckbox,
   NCheckboxGroup,
-  NSpace
+  NSpace,
+  NButton,
+  NIcon
 } from 'naive-ui'
 
 const props = defineProps<{
@@ -188,6 +258,7 @@ const formData = ref({
     {
       address: '',
       type: 'loading',
+      location_type: null,
       order: 0,
       latitude: 0,
       longitude: 0
@@ -195,6 +266,7 @@ const formData = ref({
     {
       address: '',
       type: 'unloading',
+      location_type: null,
       order: 1,
       latitude: 0,
       longitude: 0
@@ -216,6 +288,20 @@ const timeData = ref({
 const propertyTypeOptions = [
   { label: 'Residential', value: 'residential' },
   { label: 'Commercial', value: 'commercial' }
+]
+
+const actionTypeOptions = [
+  { label: 'Loading', value: 'loading' },
+  { label: 'Unloading', value: 'unloading' },
+  { label: 'Loading & Unloading', value: 'intermediate' }
+]
+
+const locationTypeOptions = [
+  { label: 'Apartment', value: 'apartment' },
+  { label: 'Storage', value: 'storage' },
+  { label: 'House', value: 'house' },
+  { label: 'Office', value: 'office' },
+  { label: 'Garage', value: 'garage' }
 ]
 
 const hourOptions = Array.from({length: 12}, (_, i) => ({
@@ -245,19 +331,21 @@ const calculatedHourlyRate = computed(() => {
 onMounted(() => {
   if (props.modelValue) {
     formData.value = { ...formData.value, ...props.modelValue }
-    
+    console.log('RequestForm initialized with data:', formData.value)
+    console.log('Addresses:', formData.value.addresses)
+
     // Parse departure time if it exists
     if (formData.value.departure_time) {
       const date = new Date(formData.value.departure_time)
       departureDate.value = date.getTime()
-      
+
       let hours = date.getHours()
       const minutes = date.getMinutes()
       const period = hours >= 12 ? 'PM' : 'AM'
-      
+
       if (hours > 12) hours -= 12
       if (hours === 0) hours = 12
-      
+
       timeData.value = {
         hour: hours,
         minute: minutes.toString().padStart(2, '0'),
@@ -272,6 +360,18 @@ watch(() => props.modelValue, (newValue) => {
   if (newValue) {
     formData.value = { ...formData.value, ...newValue }
   }
+}, { deep: true })
+
+// Watch addresses for changes
+watch(() => formData.value.addresses, (newAddresses) => {
+  console.log('Addresses changed:', newAddresses)
+  newAddresses.forEach((addr, idx) => {
+    console.log(`Address ${idx}:`, {
+      address: addr.address,
+      type: addr.type,
+      location_type: addr.location_type
+    })
+  })
 }, { deep: true })
 
 // Convert date and time to ISO string for departure_time
@@ -307,8 +407,12 @@ const updateField = (field: string, value: any) => {
 }
 
 const updateAddress = (index: number, field: string, value: any) => {
+  console.log(`updateAddress called: index=${index}, field=${field}, value=${value}`)
+
   const newAddresses = [...formData.value.addresses]
   newAddresses[index] = { ...newAddresses[index], [field]: value }
+
+  console.log('Updated address:', newAddresses[index])
   updateField('addresses', newAddresses)
 }
 
@@ -327,32 +431,79 @@ const isDateDisabled = (timestamp: number) => {
   return timestamp < today.getTime()
 }
 
-// Handle place selection from Google Maps autocomplete
-const handlePickupPlaceSelected = (place: any) => {
-  if (place.geometry && place.geometry.location) {
-    const newAddresses = [...formData.value.addresses]
-    newAddresses[0] = {
-      ...newAddresses[0],
-      latitude: place.geometry.location.lat(),
-      longitude: place.geometry.location.lng(),
-      address: place.formatted_address
-    }
-    updateField('addresses', newAddresses)
-    emit('placeSelected', 'pickup', place)
-  }
+// Get descriptive label for address based on position
+const getAddressLabel = (index: number) => {
+  if (index === 0) return 'Pickup Location'
+  if (index === formData.value.addresses.length - 1) return 'Delivery Location'
+  return `Stop ${index}`
 }
 
-const handleDeliveryPlaceSelected = (place: any) => {
-  if (place.geometry && place.geometry.location) {
-    const newAddresses = [...formData.value.addresses]
-    newAddresses[1] = {
-      ...newAddresses[1],
-      latitude: place.geometry.location.lat(),
-      longitude: place.geometry.location.lng(),
-      address: place.formatted_address
+// Add intermediate address (inserts before last address)
+const addIntermediateAddress = () => {
+  const addresses = [...formData.value.addresses]
+  const lastAddress = addresses.pop()
+
+  addresses.push({
+    address: '',
+    type: 'intermediate',
+    location_type: null,
+    order: addresses.length,
+    latitude: 0,
+    longitude: 0
+  })
+
+  if (lastAddress) {
+    lastAddress.order = addresses.length
+    addresses.push(lastAddress)
+  }
+
+  updateField('addresses', addresses)
+}
+
+// Remove address and re-index
+const removeAddress = (index: number) => {
+  const addresses = [...formData.value.addresses]
+  addresses.splice(index, 1)
+
+  // Re-order remaining addresses
+  addresses.forEach((addr, idx) => {
+    addr.order = idx
+  })
+
+  updateField('addresses', addresses)
+}
+
+// Unified place selection handler
+const handlePlaceSelected = (index: number, place: any) => {
+  console.log('handlePlaceSelected called:', index, place)
+
+  if (place?.geometry?.location) {
+    console.log('Place has geometry and location')
+
+    // Call lat() and lng() functions
+    const lat = typeof place.geometry.location.lat === 'function'
+      ? place.geometry.location.lat()
+      : place.geometry.location.lat
+
+    const lng = typeof place.geometry.location.lng === 'function'
+      ? place.geometry.location.lng()
+      : place.geometry.location.lng
+
+    console.log('Coordinates:', lat, lng)
+
+    const addresses = [...formData.value.addresses]
+    addresses[index] = {
+      ...addresses[index],
+      address: place.formatted_address,
+      latitude: lat,
+      longitude: lng
     }
-    updateField('addresses', newAddresses)
-    emit('placeSelected', 'delivery', place)
+
+    console.log('Updated addresses:', addresses)
+    updateField('addresses', addresses)
+    emit('placeSelected', index === 0 ? 'pickup' : 'delivery', place)
+  } else {
+    console.error('Place missing geometry or location:', place)
   }
 }
 
@@ -364,12 +515,23 @@ const validate = () => {
   if (!formData.value.departure_time) {
     return { valid: false, message: 'Please select a moving date and time' }
   }
-  if (!formData.value.addresses[0].address) {
-    return { valid: false, message: 'Please enter a pickup address' }
+
+  // Validate all addresses
+  for (let i = 0; i < formData.value.addresses.length; i++) {
+    if (!formData.value.addresses[i].address) {
+      return {
+        valid: false,
+        message: `Please enter address for ${getAddressLabel(i)}`
+      }
+    }
+    if (!formData.value.addresses[i].type) {
+      return {
+        valid: false,
+        message: `Please select action type for ${getAddressLabel(i)}`
+      }
+    }
   }
-  if (!formData.value.addresses[1].address) {
-    return { valid: false, message: 'Please enter a delivery address' }
-  }
+
   return { valid: true, message: '' }
 }
 
@@ -435,14 +597,99 @@ label {
   justify-content: space-between;
 }
 
+.section-header {
+  margin-bottom: 16px;
+}
+
+.section-subtitle {
+  color: #94a3b8;
+  font-size: 12px;
+  display: block;
+  margin-top: 4px;
+}
+
+.address-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.address-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.address-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #334155;
+}
+
+.address-number {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.number-badge {
+  width: 28px;
+  height: 28px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.address-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #e2e8f0;
+}
+
+.address-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.add-address-container {
+  margin-top: 8px;
+}
+
+.optional-text {
+  font-size: 11px;
+  font-weight: 400;
+  color: #9ca3af;
+}
+
 @media (max-width: 640px) {
   .form-row {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .form-group.full-width {
     grid-column: span 1;
+  }
+
+  .address-card {
+    padding: 12px;
+  }
+
+  .address-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }
 </style>

@@ -8,6 +8,7 @@ export interface Address {
   id?: number
   address: string
   type: 'loading' | 'intermediate' | 'unloading'
+  location_type?: 'apartment' | 'storage' | 'house' | 'office' | 'garage'
   order: number
   latitude: number
   longitude: number

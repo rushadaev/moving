@@ -42,6 +42,7 @@ class RequestController extends Controller
             'addresses' => 'required|array|min:2',
             'addresses.*.address' => 'required|string',
             'addresses.*.type' => 'required|in:loading,unloading,intermediate',
+            'addresses.*.location_type' => 'nullable|in:apartment,storage,house,office,garage',
             'addresses.*.order' => 'required|integer|min:0',
             'addresses.*.latitude' => 'required|numeric|between:-90,90',
             'addresses.*.longitude' => 'required|numeric|between:-180,180',
@@ -61,6 +62,7 @@ class RequestController extends Controller
             $movingRequest->addresses()->create([
                 'address' => $address['address'],
                 'type' => $address['type'],
+                'location_type' => $address['location_type'] ?? null,
                 'order' => $address['order'],
                 'latitude' => $address['latitude'],
                 'longitude' => $address['longitude']
@@ -100,6 +102,7 @@ class RequestController extends Controller
             'addresses' => 'sometimes|required|array|min:2',
             'addresses.*.address' => 'required|string',
             'addresses.*.type' => 'required|in:loading,unloading,intermediate',
+            'addresses.*.location_type' => 'nullable|in:apartment,storage,house,office,garage',
             'addresses.*.order' => 'required|integer|min:0',
             'addresses.*.latitude' => 'required|numeric|between:-90,90',
             'addresses.*.longitude' => 'required|numeric|between:-180,180',
@@ -116,6 +119,7 @@ class RequestController extends Controller
                 $request->addresses()->create([
                     'address' => $address['address'],
                     'type' => $address['type'],
+                    'location_type' => $address['location_type'] ?? null,
                     'order' => $address['order'],
                     'latitude' => $address['latitude'],
                     'longitude' => $address['longitude']

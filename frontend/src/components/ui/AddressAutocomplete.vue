@@ -102,18 +102,24 @@ const handleBlur = () => {
 }
 
 const selectSuggestion = async (suggestion: any) => {
+  console.log('selectSuggestion called with:', suggestion)
+
   // Get place details
   const placeId = suggestion.place_id
-  
+
   placesService.getDetails({
     placeId: placeId,
     fields: ['formatted_address', 'geometry', 'name'],
     sessionToken: sessionToken
   }, (place: any, status: any) => {
+    console.log('getDetails response:', status, place)
+
     if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
       const address = place.formatted_address || place.name
+      console.log('Emitting update:modelValue with:', address)
       emit('update:modelValue', address)
-      emit('placeSelected', {
+
+      const placeData = {
         formatted_address: address,
         geometry: {
           location: {
@@ -121,35 +127,48 @@ const selectSuggestion = async (suggestion: any) => {
             lng: () => place.geometry.location.lng()
           }
         }
-      })
-      
+      }
+      console.log('Emitting placeSelected with:', placeData)
+      emit('placeSelected', placeData)
+
       // Reset session token after place selection
       sessionToken = null
       suggestions.value = []
       showSuggestions.value = false
+    } else {
+      console.error('Failed to get place details:', status)
     }
   })
 }
 
 onMounted(async () => {
-  if (!inputRef.value) return
+  console.log('AddressAutocomplete mounted')
+
+  if (!inputRef.value) {
+    console.error('Input ref not available')
+    return
+  }
 
   try {
+    console.log('Loading Google Maps...')
     await loadGoogleMaps()
-    
+    console.log('Google Maps loaded successfully')
+
     // Wait a bit for places library to be fully loaded
     await new Promise(resolve => setTimeout(resolve, 100))
-    
+
     // Check if places library is loaded
     if (!window.google?.maps?.places) {
       console.error('Google Maps Places library not loaded')
       return
     }
-    
+
+    console.log('Initializing autocomplete services...')
     // Initialize services
     autocompleteService = new window.google.maps.places.AutocompleteService()
     placesService = new window.google.maps.places.PlacesService(document.createElement('div'))
-    
+    console.log('Autocomplete services initialized successfully')
+
   } catch (error) {
     console.error('Failed to initialize Google Maps autocomplete:', error)
   }
