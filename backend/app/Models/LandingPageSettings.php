@@ -20,10 +20,12 @@ class LandingPageSettings extends Model
         'instagram_url',
         'facebook_url',
         'youtube_url',
+        'hourly_rate',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'hourly_rate' => 'decimal:2',
     ];
 }

@@ -191,15 +191,29 @@ const createRequest = async () => {
       packing_tape: 3, // $3 for packing tape
       full_service: 200 // $200 for full service packing
     };
-    
-    // Calculate selected packing cost
-    const selectedPackingCost = formData.value.packing_options.reduce((total, option) => {
-      return total + (packingPrices[option as keyof typeof packingPrices] || 0);
-    }, 0);
-    
+
+    // Calculate packing cost from materials with quantities
+    let selectedPackingCost = 0;
+    const materialsDetails: any[] = [];
+
+    if (formData.value.materials && Array.isArray(formData.value.materials)) {
+      formData.value.materials.forEach((material: any) => {
+        const price = packingPrices[material.name as keyof typeof packingPrices] || 0;
+        const itemTotal = price * material.quantity;
+        selectedPackingCost += itemTotal;
+
+        materialsDetails.push({
+          name: material.name,
+          quantity: material.quantity,
+          price: price,
+          total: itemTotal
+        });
+      });
+    }
+
     // Calculate travel cost (example: $2 per mile)
     const travelCost = distanceMiles * 2;
-    
+
     // Add distance to form data (hourly_rate is already calculated in the form)
     const requestData = {
       ...formData.value,
@@ -208,9 +222,8 @@ const createRequest = async () => {
       pricing_details: {
         hourly_rate: formData.value.hourly_rate,
         travel_cost: travelCost,
-        selected_packing_options: formData.value.packing_options,
+        materials: materialsDetails,
         packing_cost: selectedPackingCost,
-        packing_prices: packingPrices,
         distance_miles: distanceMiles,
         movers_count: formData.value.movers_count,
         estimated_hours: 3, // Default estimate - backend can adjust

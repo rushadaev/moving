@@ -22,6 +22,7 @@ class LandingPageSeeder extends Seeder
             'description' => 'Moowee is your trusted partner for stress-free moves.<br>We specialize in residential, commercial, and local moving services, delivering reliability, care, and professionalism with every box we lift. Whether you\'re relocating your home, office, or apartment, Moowee gets you there — smoothly, safely, and on time.',
             'phone' => '+1(310) 753-42-48',
             'email' => 'mooweemoving@gmail.com',
+            'hourly_rate' => 100.00,
         ]);
 
         // Create sample reviews

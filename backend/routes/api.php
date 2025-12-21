@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\RequestController;
 use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\PackingMaterialController;
 use App\Http\Controllers\Api\LandingPageController;
 
 /*
@@ -23,6 +24,7 @@ use App\Http\Controllers\Api\LandingPageController;
 Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/packing-materials', [PackingMaterialController::class, 'index']);
 });
 
 // Landing page routes (public)

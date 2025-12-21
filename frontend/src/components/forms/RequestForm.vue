@@ -187,6 +187,7 @@
           :value="calculatedHourlyRate"
           :disabled="true"
           :precision="2"
+          :show-button="false"
           style="width: 100%"
         />
       </div>
@@ -195,25 +196,107 @@
     <!-- Packing Options -->
     <div class="form-group full-width">
       <label>Packing Options (Optional)</label>
-      <n-checkbox-group 
-        :value="formData.packing_options"
-        @update:value="updateField('packing_options', $event)"
-      >
-        <n-space>
-          <n-checkbox value="boxes" label="Boxes">
-            Boxes
-          </n-checkbox>
-          <n-checkbox value="bubble_wrap" label="Bubble Wrap">
-            Bubble Wrap
-          </n-checkbox>
-          <n-checkbox value="packing_tape" label="Packing Tape">
-            Packing Tape
-          </n-checkbox>
-          <n-checkbox value="full_service" label="Full Service Packing">
-            Full Service Packing
-          </n-checkbox>
-        </n-space>
-      </n-checkbox-group>
+      <div class="packing-options-grid">
+        <!-- Full Service Packing -->
+        <div class="packing-option-card full-service-card" :class="{ 'active': isFullService }">
+          <div class="packing-option-header">
+            <img src="/Icons/Box Moowee.svg" alt="Full Service" class="packing-icon" />
+            <span class="packing-name">Full Service Packing</span>
+          </div>
+          <div class="packing-controls">
+            <label class="checkbox-container">
+              <input
+                type="checkbox"
+                v-model="isFullService"
+                @change="toggleFullService"
+                class="checkbox-input"
+              />
+              <span class="checkbox-custom"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Boxes -->
+        <div class="packing-option-card" :class="{ 'disabled': isFullService }">
+          <div class="packing-option-header">
+            <img src="/Icons/Box S.svg" alt="Boxes" class="packing-icon" />
+            <span class="packing-name">Boxes</span>
+          </div>
+          <div class="packing-controls">
+            <button
+              @click="decreasePackingQuantity('boxes')"
+              class="quantity-btn"
+              type="button"
+              :disabled="isFullService"
+            >
+              <img src="/Icons/-.svg" alt="Decrease" class="btn-icon" />
+            </button>
+            <span class="quantity-display">{{ packingQuantities.boxes || 0 }}</span>
+            <button
+              @click="increasePackingQuantity('boxes')"
+              class="quantity-btn"
+              type="button"
+              :disabled="isFullService"
+            >
+              <img src="/Icons/+.svg" alt="Increase" class="btn-icon" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Bubble Wrap -->
+        <div class="packing-option-card" :class="{ 'disabled': isFullService }">
+          <div class="packing-option-header">
+            <img src="/Icons/Bubble Wrap.svg" alt="Bubble Wrap" class="packing-icon" />
+            <span class="packing-name">Bubble Wrap</span>
+          </div>
+          <div class="packing-controls">
+            <button
+              @click="decreasePackingQuantity('bubble_wrap')"
+              class="quantity-btn"
+              type="button"
+              :disabled="isFullService"
+            >
+              <img src="/Icons/-.svg" alt="Decrease" class="btn-icon" />
+            </button>
+            <span class="quantity-display">{{ packingQuantities.bubble_wrap || 0 }}</span>
+            <button
+              @click="increasePackingQuantity('bubble_wrap')"
+              class="quantity-btn"
+              type="button"
+              :disabled="isFullService"
+            >
+              <img src="/Icons/+.svg" alt="Increase" class="btn-icon" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Packing Tape -->
+        <div class="packing-option-card" :class="{ 'disabled': isFullService }">
+          <div class="packing-option-header">
+            <img src="/Icons/Plastic tape.svg" alt="Packing Tape" class="packing-icon" />
+            <span class="packing-name">Packing Tape</span>
+          </div>
+          <div class="packing-controls">
+            <button
+              @click="decreasePackingQuantity('packing_tape')"
+              class="quantity-btn"
+              type="button"
+              :disabled="isFullService"
+            >
+              <img src="/Icons/-.svg" alt="Decrease" class="btn-icon" />
+            </button>
+            <span class="quantity-display">{{ packingQuantities.packing_tape || 0 }}</span>
+            <button
+              @click="increasePackingQuantity('packing_tape')"
+              class="quantity-btn"
+              type="button"
+              :disabled="isFullService"
+            >
+              <img src="/Icons/+.svg" alt="Increase" class="btn-icon" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -226,9 +309,6 @@ import {
   NInput,
   NInputNumber,
   NDatePicker,
-  NCheckbox,
-  NCheckboxGroup,
-  NSpace,
   NButton,
   NIcon
 } from 'naive-ui'
@@ -275,6 +355,17 @@ const formData = ref({
   materials: [],
   packing_options: []
 })
+
+// Packing quantities state
+const packingQuantities = ref({
+  full_service: 0,
+  boxes: 0,
+  bubble_wrap: 0,
+  packing_tape: 0
+})
+
+// Full service state
+const isFullService = ref(false)
 
 // Date and time state
 const departureDate = ref<number | null>(null)
@@ -352,6 +443,20 @@ onMounted(() => {
         period: period
       }
     }
+
+    // Restore packing quantities from materials
+    if (formData.value.materials && Array.isArray(formData.value.materials)) {
+      console.log('Restoring materials:', formData.value.materials)
+      formData.value.materials.forEach((material: any) => {
+        if (packingQuantities.value[material.name] !== undefined) {
+          packingQuantities.value[material.name] = material.quantity
+        }
+        // Check if Full Service is selected
+        if (material.name === 'full_service' && material.quantity > 0) {
+          isFullService.value = true
+        }
+      })
+    }
   }
 })
 
@@ -359,6 +464,20 @@ onMounted(() => {
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
     formData.value = { ...formData.value, ...newValue }
+
+    // Restore packing quantities when modelValue changes
+    if (newValue.materials && Array.isArray(newValue.materials)) {
+      console.log('Restoring materials from watch:', newValue.materials)
+      newValue.materials.forEach((material: any) => {
+        if (packingQuantities.value[material.name] !== undefined) {
+          packingQuantities.value[material.name] = material.quantity
+        }
+        // Check if Full Service is selected
+        if (material.name === 'full_service' && material.quantity > 0) {
+          isFullService.value = true
+        }
+      })
+    }
   }
 }, { deep: true })
 
@@ -422,6 +541,65 @@ const updateTime = (field: 'hour' | 'minute' | 'period', value: any) => {
 
 const updateDepartureDate = (value: number | null) => {
   departureDate.value = value
+}
+
+// Toggle Full Service Packing
+const toggleFullService = () => {
+  // v-model already handles the toggle, just react to the new state
+  if (isFullService.value) {
+    // Set Full Service quantity to 1, reset others
+    packingQuantities.value.full_service = 1
+    packingQuantities.value.boxes = 0
+    packingQuantities.value.bubble_wrap = 0
+    packingQuantities.value.packing_tape = 0
+  } else {
+    // Uncheck Full Service
+    packingQuantities.value.full_service = 0
+  }
+
+  updatePackingOptions()
+}
+
+// Packing quantity management
+const increasePackingQuantity = (type: string) => {
+  if (packingQuantities.value[type] !== undefined) {
+    packingQuantities.value[type]++
+    updatePackingOptions()
+  }
+}
+
+const decreasePackingQuantity = (type: string) => {
+  if (packingQuantities.value[type] !== undefined && packingQuantities.value[type] > 0) {
+    packingQuantities.value[type]--
+    updatePackingOptions()
+  }
+}
+
+const updatePackingOptions = () => {
+  // Material prices
+  const prices: Record<string, number> = {
+    full_service: 200,
+    boxes: 5,
+    bubble_wrap: 10,
+    packing_tape: 3
+  }
+
+  // Create materials array with name, quantity, and price
+  const materials: Array<{ name: string; quantity: number; price: number }> = []
+  Object.keys(packingQuantities.value).forEach(key => {
+    if (packingQuantities.value[key] > 0) {
+      materials.push({
+        name: key,
+        quantity: packingQuantities.value[key],
+        price: prices[key] || 0
+      })
+    }
+  })
+  updateField('materials', materials)
+
+  // Also update packing_options for backward compatibility
+  const options: string[] = materials.map(m => m.name)
+  updateField('packing_options', options)
 }
 
 // Disable past dates
@@ -609,7 +787,7 @@ label {
 }
 
 .address-card {
-  background: #1e293b;
+  background: #303134;
   border: 1px solid #334155;
   border-radius: 8px;
   padding: 16px;
@@ -672,6 +850,163 @@ label {
   color: #9ca3af;
 }
 
+/* Packing Options Styles */
+.packing-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.packing-option-card {
+  background: #303134;
+  border: 2px solid #334155;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.packing-option-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.packing-option-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.packing-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.packing-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e2e8f0;
+  flex: 1;
+}
+
+.packing-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.quantity-btn {
+  background: transparent;
+  border: 2px solid #334155;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.quantity-btn:hover {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.quantity-btn:active {
+  transform: scale(0.95);
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.quantity-display {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e2e8f0;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Full Service Card */
+.full-service-card {
+  border-color: #3b82f6;
+}
+
+.full-service-card.active {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Disabled State */
+.packing-option-card.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.packing-option-card.disabled .quantity-btn {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Custom Checkbox */
+.checkbox-container {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.checkbox-custom {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: transparent;
+  pointer-events: none;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '✓';
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.checkbox-container:hover .checkbox-custom {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
 @media (max-width: 640px) {
   .form-row {
     grid-template-columns: 1fr;
@@ -690,6 +1025,10 @@ label {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+
+  .packing-options-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

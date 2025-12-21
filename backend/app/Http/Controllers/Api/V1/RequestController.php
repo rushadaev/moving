@@ -49,6 +49,8 @@ class RequestController extends Controller
             'materials' => 'nullable|array',
             'materials.*.name' => 'required|string',
             'materials.*.quantity' => 'required|integer|min:1',
+            'materials.*.price' => 'required|numeric|min:0',
+            'materials.*.packing_material_id' => 'nullable|exists:packing_materials,id',
         ]);
 
         $validated['request_number'] = 'REQ-' . strtoupper(Str::random(8));
@@ -72,7 +74,12 @@ class RequestController extends Controller
         // Create materials if provided
         if ($request->has('materials')) {
             foreach ($request->materials as $material) {
-                $movingRequest->materials()->create($material);
+                $movingRequest->materials()->create([
+                    'name' => $material['name'],
+                    'quantity' => $material['quantity'],
+                    'price' => $material['price'],
+                    'packing_material_id' => $material['packing_material_id'] ?? null,
+                ]);
             }
         }
 
@@ -109,6 +116,8 @@ class RequestController extends Controller
             'materials' => 'nullable|array',
             'materials.*.name' => 'required|string',
             'materials.*.quantity' => 'required|integer|min:1',
+            'materials.*.price' => 'required|numeric|min:0',
+            'materials.*.packing_material_id' => 'nullable|exists:packing_materials,id',
         ]);
 
         $request->update($validated);
@@ -130,7 +139,12 @@ class RequestController extends Controller
         if ($httpRequest->has('materials')) {
             $request->materials()->delete();
             foreach ($httpRequest->materials as $material) {
-                $request->materials()->create($material);
+                $request->materials()->create([
+                    'name' => $material['name'],
+                    'quantity' => $material['quantity'],
+                    'price' => $material['price'],
+                    'packing_material_id' => $material['packing_material_id'] ?? null,
+                ]);
             }
         }
 

@@ -13,15 +13,23 @@ class Material extends Model
     protected $fillable = [
         'request_id',
         'name',
-        'quantity'
+        'quantity',
+        'price',
+        'packing_material_id',
     ];
 
     protected $casts = [
-        'quantity' => 'integer'
+        'quantity' => 'integer',
+        'price' => 'decimal:2',
     ];
 
     public function request(): BelongsTo
     {
         return $this->belongsTo(Request::class);
+    }
+
+    public function packingMaterial(): BelongsTo
+    {
+        return $this->belongsTo(PackingMaterial::class);
     }
 } 
