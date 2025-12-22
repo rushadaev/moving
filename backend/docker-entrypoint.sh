@@ -15,5 +15,9 @@ fi
 # Run migrations
 php artisan migrate --force
 
+# Seed essential data
+php artisan db:seed --class=RoleSeeder --force
+php artisan db:seed --class=LandingServiceSeeder --force
+
 # Start PHP-FPM
 php-fpm 

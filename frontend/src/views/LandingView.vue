@@ -7,7 +7,7 @@
 
     <template v-else>
       <!-- Header -->
-      <header class="p-6 flex flex-col items-center bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl m-4 w-full max-w-3xl border border-gray-400">
+      <header class="p-6 flex flex-col items-center bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl mx-4 sm:mx-6 md:mx-8 my-4 w-full max-w-3xl border border-gray-400">
         <img :src="getImageUrl(settings?.logo) || logoIcon" alt="Company Logo" class="w-24 mb-2" />
         <h1 class="text-2xl font-bold text-gray-800">{{ settings?.company_name || 'MOOWEE' }}</h1>
         <p v-if="settings?.tagline" class="text-center text-gray-800 mt-2 font-semibold">{{ settings.tagline }}</p>
@@ -15,7 +15,7 @@
       </header>
 
       <!-- Services Grid -->
-      <section v-if="services.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4 w-full max-w-6xl">
+      <section v-if="services.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-4 sm:mx-6 md:mx-8 my-4 w-full max-w-6xl">
         <div
           v-for="service in services"
           :key="service.id"
@@ -33,7 +33,7 @@
       </section>
 
       <!-- Кнопки -->
-      <div class="flex justify-center gap-4 m-4 w-full max-w-3xl">
+      <div class="flex justify-center gap-4 mx-4 sm:mx-6 md:mx-8 my-4 w-full max-w-3xl">
         <button
           class="btn bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
           @click="handleBookMoving(null)"
@@ -197,7 +197,7 @@
       <!-- Фото -->
       <section
         v-if="settings?.photo_url"
-        class="m-4 flex flex-col items-center w-full max-w-3xl"
+        class="mx-4 sm:mx-6 md:mx-8 my-4 flex flex-col items-center w-full max-w-3xl"
       >
         <img :src="getImageUrl(settings.photo_url)" :alt="settings.photo_title" class="rounded-lg w-full aspect-video object-cover" />
       </section>
@@ -205,7 +205,7 @@
       <!-- Видео -->
       <section
         v-if="settings?.video_url"
-        class="m-4 flex flex-col items-center w-full max-w-3xl"
+        class="mx-4 sm:mx-6 md:mx-8 my-4 flex flex-col items-center w-full max-w-3xl"
       >
         <!-- YouTube/Embedded video -->
         <iframe
@@ -224,7 +224,7 @@
       </section>
 
       <!-- Отзывы -->
-      <section v-if="reviews.length > 0" class="flex flex-row justify-center gap-2 m-4 w-full max-w-3xl overflow-x-auto">
+      <section v-if="reviews.length > 0" class="flex flex-row justify-center gap-2 mx-4 sm:mx-6 md:mx-8 my-4 w-full max-w-3xl overflow-x-auto">
         <div
           v-for="review in reviews"
           :key="review.id"
@@ -245,7 +245,7 @@
       </section>
 
       <!-- Контакты -->
-      <footer class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl m-4 p-4 text-gray-800 w-full max-w-3xl border border-gray-400">
+      <footer class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl mx-4 sm:mx-6 md:mx-8 my-4 p-4 text-gray-800 w-full max-w-3xl border border-gray-400">
         <h2 class="font-bold text-xl">Contacts</h2>
         <div class="flex flex-col gap-1 mt-2">
           <div v-if="settings?.phone" class="flex items-center gap-2">
