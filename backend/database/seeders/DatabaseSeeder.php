@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             RequestSeeder::class,
             PackingMaterialSeeder::class,
+            LandingServiceSeeder::class,
         ]);
     }
 }

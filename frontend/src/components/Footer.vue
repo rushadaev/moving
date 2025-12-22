@@ -123,7 +123,9 @@ footer {
 
 .mobile-navigation {
   width: 100%;
-  background: var(--color-background-mute);
+  background: linear-gradient(to bottom, #475569, #d1d5db, #475569);
+  border-top: 1px solid #6b7280;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .full-width-button-group {

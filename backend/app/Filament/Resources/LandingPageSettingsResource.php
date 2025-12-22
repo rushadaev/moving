@@ -96,6 +96,90 @@ class LandingPageSettingsResource extends Resource
                             ->maxLength(255),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('Pricing Settings')
+                    ->schema([
+                        Forms\Components\TextInput::make('hourly_rate')
+                            ->label('Hourly Rate ($)')
+                            ->numeric()
+                            ->required()
+                            ->prefix('$')
+                            ->default(100.00)
+                            ->helperText('Base hourly rate per hour'),
+                        Forms\Components\TextInput::make('floor_fee')
+                            ->label('Additional Fee per Floor ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(0)
+                            ->helperText('Additional charge per floor'),
+                        Forms\Components\TextInput::make('transportation_fee_per_mile')
+                            ->label('Transportation Fee per Mile ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(2.00)
+                            ->helperText('Cost per mile for transportation'),
+                    ])
+                    ->columns(3)
+                    ->collapsible(),
+
+                Forms\Components\Section::make('Packing Materials Prices')
+                    ->schema([
+                        Forms\Components\TextInput::make('small_box_price')
+                            ->label('Small Box ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(3.00),
+                        Forms\Components\TextInput::make('medium_box_price')
+                            ->label('Medium Box ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(5.00),
+                        Forms\Components\TextInput::make('large_box_price')
+                            ->label('Large Box ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(7.00),
+                        Forms\Components\TextInput::make('wardrobe_box_price')
+                            ->label('Wardrobe Box ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(12.00),
+                        Forms\Components\TextInput::make('paper_price')
+                            ->label('Paper ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(6.00),
+                        Forms\Components\TextInput::make('plastic_tape_price')
+                            ->label('Plastic Tape ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(4.00),
+                        Forms\Components\TextInput::make('bubble_wrap_price')
+                            ->label('Bubble Wrap ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(10.00),
+                    ])
+                    ->columns(3)
+                    ->collapsible(),
+
+                Forms\Components\Section::make('Special Services')
+                    ->schema([
+                        Forms\Components\TextInput::make('piano_fee')
+                            ->label('Piano Fee ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(0)
+                            ->helperText('Additional charge for moving piano'),
+                        Forms\Components\TextInput::make('gun_safe_fee')
+                            ->label('Gun Safe Fee ($)')
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(0)
+                            ->helperText('Additional charge for moving gun safe'),
+                    ])
+                    ->columns(2)
+                    ->collapsible(),
             ]);
     }
 
