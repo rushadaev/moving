@@ -6,16 +6,18 @@
     </div>
 
     <template v-else>
-      <!-- Header -->
-      <header class="p-6 flex flex-col items-center bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl mx-4 sm:mx-6 md:mx-8 my-4 w-full max-w-3xl border border-gray-400">
-        <img :src="getImageUrl(settings?.logo) || logoIcon" alt="Company Logo" class="w-24 mb-2" />
-        <h1 class="text-2xl font-bold text-gray-800">{{ settings?.company_name || 'MOOWEE' }}</h1>
-        <p v-if="settings?.tagline" class="text-center text-gray-800 mt-2 font-semibold">{{ settings.tagline }}</p>
-        <p v-if="settings?.description" class="text-xs text-gray-700 mt-1" v-html="settings.description"></p>
-      </header>
+      <!-- Main Content with side padding -->
+      <div class="w-full px-4 sm:px-6 md:px-8 flex flex-col items-center">
+        <!-- Header -->
+        <header class="p-6 flex flex-col items-center bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl my-4 w-full max-w-3xl border border-gray-400">
+          <img :src="getImageUrl(settings?.logo) || logoIcon" alt="Company Logo" class="w-24 mb-2" />
+          <h1 class="text-2xl font-bold text-gray-800">{{ settings?.company_name || 'MOOWEE' }}</h1>
+          <p v-if="settings?.tagline" class="text-center text-gray-800 mt-2 font-semibold">{{ settings.tagline }}</p>
+          <p v-if="settings?.description" class="text-xs text-gray-700 mt-1" v-html="settings.description"></p>
+        </header>
 
-      <!-- Services Grid -->
-      <section v-if="services.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-4 sm:mx-6 md:mx-8 my-4 w-full max-w-6xl">
+        <!-- Services Grid -->
+        <section v-if="services.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-4 w-full max-w-6xl">
         <div
           v-for="service in services"
           :key="service.id"
@@ -32,8 +34,8 @@
         </div>
       </section>
 
-      <!-- Кнопки -->
-      <div class="flex justify-center gap-4 mx-4 sm:mx-6 md:mx-8 my-4 w-full max-w-3xl">
+        <!-- Кнопки -->
+        <div class="flex justify-center gap-4 my-4 w-full max-w-3xl">
         <button
           class="btn bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
           @click="handleBookMoving(null)"
@@ -194,37 +196,37 @@
         </div>
       </div>
 
-      <!-- Фото -->
-      <section
-        v-if="settings?.photo_url"
-        class="mx-4 sm:mx-6 md:mx-8 my-4 flex flex-col items-center w-full max-w-3xl"
-      >
-        <img :src="getImageUrl(settings.photo_url)" :alt="settings.photo_title" class="rounded-lg w-full aspect-video object-cover" />
-      </section>
+        <!-- Фото -->
+        <section
+          v-if="settings?.photo_url"
+          class="my-4 flex flex-col items-center w-full max-w-3xl"
+        >
+          <img :src="getImageUrl(settings.photo_url)" :alt="settings.photo_title" class="rounded-lg w-full aspect-video object-cover" />
+        </section>
 
-      <!-- Видео -->
-      <section
-        v-if="settings?.video_url"
-        class="mx-4 sm:mx-6 md:mx-8 my-4 flex flex-col items-center w-full max-w-3xl"
-      >
-        <!-- YouTube/Embedded video -->
-        <iframe
-          v-if="isYouTubeOrEmbedUrl(settings.video_url)"
-          :src="getVideoEmbedUrl(settings.video_url)"
-          class="rounded-lg w-full aspect-video"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen
-          referrerpolicy="strict-origin-when-cross-origin"
-        ></iframe>
-        <!-- Direct video file -->
-        <video v-else controls class="rounded-lg w-full aspect-video">
-          <source :src="settings.video_url" type="video/mp4" />
-        </video>
-      </section>
+        <!-- Видео -->
+        <section
+          v-if="settings?.video_url"
+          class="my-4 flex flex-col items-center w-full max-w-3xl"
+        >
+          <!-- YouTube/Embedded video -->
+          <iframe
+            v-if="isYouTubeOrEmbedUrl(settings.video_url)"
+            :src="getVideoEmbedUrl(settings.video_url)"
+            class="rounded-lg w-full aspect-video"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+          <!-- Direct video file -->
+          <video v-else controls class="rounded-lg w-full aspect-video">
+            <source :src="settings.video_url" type="video/mp4" />
+          </video>
+        </section>
 
-      <!-- Отзывы -->
-      <section v-if="reviews.length > 0" class="flex flex-row justify-center gap-2 mx-4 sm:mx-6 md:mx-8 my-4 w-full max-w-3xl overflow-x-auto">
+        <!-- Отзывы -->
+        <section v-if="reviews.length > 0" class="flex flex-row justify-center gap-2 my-4 w-full max-w-3xl overflow-x-auto">
         <div
           v-for="review in reviews"
           :key="review.id"
@@ -243,9 +245,11 @@
           <div class="text-xs mt-2 font-bold text-gray-800">— {{ review.customer_name }}</div>
         </div>
       </section>
+      </div>
+      <!-- End Main Content -->
 
       <!-- Контакты -->
-      <footer class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 rounded-xl mx-4 sm:mx-6 md:mx-8 my-4 p-4 text-gray-800 w-full max-w-3xl border border-gray-400">
+      <footer class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 p-6 text-gray-800 w-full max-w-full border-t border-gray-400">
         <h2 class="font-bold text-xl">Contacts</h2>
         <div class="flex flex-col gap-1 mt-2">
           <div v-if="settings?.phone" class="flex items-center gap-2">
