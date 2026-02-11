@@ -117,6 +117,74 @@ nginx-logs: ## Show nginx logs
 	docker-compose -f docker-compose.prod.yml logs -f nginx
 
 # ============================================
+# DEPLOYMENT COMMANDS
+# ============================================
+
+deploy: ## Full deployment - pull, rebuild, migrate, optimize (RECOMMENDED)
+	@echo '$(BLUE)╔══════════════════════════════════════════╗$(NC)'
+	@echo '$(BLUE)║     Starting Full Deployment            ║$(NC)'
+	@echo '$(BLUE)╚══════════════════════════════════════════╝$(NC)'
+	@echo ''
+	@echo '$(YELLOW)Step 1/6: Pulling latest code from Git...$(NC)'
+	git pull origin main
+	@echo ''
+	@echo '$(YELLOW)Step 2/6: Building Docker images...$(NC)'
+	docker-compose -f docker-compose.prod.yml build
+	@echo ''
+	@echo '$(YELLOW)Step 3/6: Restarting containers...$(NC)'
+	docker-compose -f docker-compose.prod.yml up -d
+	@echo ''
+	@echo '$(YELLOW)Step 4/6: Running database migrations...$(NC)'
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan migrate --force
+	@echo ''
+	@echo '$(YELLOW)Step 5/6: Clearing caches...$(NC)'
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan config:clear
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan cache:clear
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan route:clear
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan view:clear
+	@echo ''
+	@echo '$(YELLOW)Step 6/6: Optimizing for production...$(NC)'
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan config:cache
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan route:cache
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan view:cache
+	@echo ''
+	@echo '$(GREEN)╔══════════════════════════════════════════╗$(NC)'
+	@echo '$(GREEN)║   Deployment Completed Successfully!    ║$(NC)'
+	@echo '$(GREEN)╚══════════════════════════════════════════╝$(NC)'
+
+deploy-quick: ## Quick deployment - pull and restart only (no rebuild)
+	@echo '$(BLUE)Starting quick deployment...$(NC)'
+	git pull origin main
+	docker-compose -f docker-compose.prod.yml restart
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan migrate --force
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan config:clear
+	@echo '$(GREEN)Quick deployment completed!$(NC)'
+
+deploy-force: ## Force deployment - rebuild everything from scratch
+	@echo '$(RED)WARNING: This will rebuild all containers from scratch!$(NC)'
+	@read -p "Are you sure? [y/N] " -n 1 -r; \
+	echo; \
+	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
+		git pull origin main; \
+		docker-compose -f docker-compose.prod.yml down; \
+		docker-compose -f docker-compose.prod.yml build --no-cache; \
+		docker-compose -f docker-compose.prod.yml up -d; \
+		sleep 10; \
+		docker-compose -f docker-compose.prod.yml exec -T backend php artisan migrate --force; \
+		docker-compose -f docker-compose.prod.yml exec -T backend php artisan config:cache; \
+		docker-compose -f docker-compose.prod.yml exec -T backend php artisan route:cache; \
+		echo '$(GREEN)Force deployment completed!$(NC)'; \
+	fi
+
+deploy-rollback: ## Rollback to previous Git commit
+	@echo '$(RED)Rolling back to previous commit...$(NC)'
+	git reset --hard HEAD~1
+	docker-compose -f docker-compose.prod.yml build
+	docker-compose -f docker-compose.prod.yml up -d
+	docker-compose -f docker-compose.prod.yml exec -T backend php artisan migrate --force
+	@echo '$(YELLOW)Rollback completed! Check if everything works.$(NC)'
+
+# ============================================
 # UTILITY COMMANDS
 # ============================================
 
@@ -145,3 +213,36 @@ health-check: ## Check health of all services
 	@echo '$(BLUE)Checking service health...$(NC)'
 	@curl -s -o /dev/null -w "Moving site: %{http_code}\n" https://mooweemoving.com || echo "Moving site: DOWN"
 	@curl -s -o /dev/null -w "AlexBuild site: %{http_code}\n" https://alexbuildservice.net || echo "AlexBuild site: DOWN"
+
+backup-db: ## Backup database to backups/ directory
+	@echo '$(BLUE)Creating database backup...$(NC)'
+	@mkdir -p backups
+	@DATE=$$(date +%Y%m%d_%H%M%S); \
+	docker-compose -f docker-compose.prod.yml exec -T mysql mysqldump -u root -psecret laravel > backups/db_backup_$$DATE.sql; \
+	echo '$(GREEN)Database backup created: backups/db_backup_'$$DATE'.sql$(NC)'
+
+restore-db: ## Restore database from backup file (usage: make restore-db FILE=backups/db_backup_20250211.sql)
+	@if [ -z "$(FILE)" ]; then \
+		echo '$(RED)Error: Please specify backup file. Usage: make restore-db FILE=backups/db_backup_20250211.sql$(NC)'; \
+		exit 1; \
+	fi
+	@echo '$(YELLOW)Restoring database from $(FILE)...$(NC)'
+	@docker-compose -f docker-compose.prod.yml exec -T mysql mysql -u root -psecret laravel < $(FILE)
+	@echo '$(GREEN)Database restored successfully!$(NC)'
+
+update-all: ## Update everything (alias for deploy)
+	@make deploy
+
+# ============================================
+# MONITORING COMMANDS
+# ============================================
+
+watch-logs: ## Watch logs from all services in real-time
+	docker-compose -f docker-compose.prod.yml logs -f --tail=100
+
+disk-usage: ## Show disk usage for Docker
+	@echo '$(BLUE)Docker disk usage:$(NC)'
+	@docker system df
+	@echo ''
+	@echo '$(BLUE)Container sizes:$(NC)'
+	@docker-compose -f docker-compose.prod.yml ps -a --format "table {{.Service}}\t{{.Status}}\t{{.Size}}"
