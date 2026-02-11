@@ -13,7 +13,7 @@ import MaterialCounter from '@/components/ui/MaterialCounter.vue';
 import ChangeMoversModal from '@/components/modals/ChangeMoversModal.vue';
 import AddMaterialModal from '@/components/modals/AddMaterialModal.vue';
 import UnloadLoadModal from '@/components/modals/UnloadLoadModal.vue';
-import { NDrawer, NDrawerContent, NIcon } from 'naive-ui';
+import { NDrawer, NDrawerContent, NIcon, NSelect } from 'naive-ui';
 
 const router = useRouter();
 const requestsStore = useRequestsStore();
@@ -33,6 +33,8 @@ const allAddressesVisited = ref(false);
 const showDrawer = ref(false);
 const materialSaveTimeout = ref(null);
 const bottomOverlayExpanded = ref(true);
+const selectedRequestId = ref<number | null>(null);
+const userRequests = ref([]);
 
 // Computed properties for request details
 const departureTime = computed(() => {
@@ -137,6 +139,19 @@ const mainActionButtonText = computed(() => {
   if (onBreak.value) return 'Continue';
   if (allAddressesVisited.value) return 'Complete request';
   return 'Take a break';
+});
+
+// Request selector options
+const requestOptions = computed(() => {
+  return userRequests.value.map((request: any) => {
+    const date = new Date(request.departure_time);
+    const formattedDate = date.toLocaleDateString();
+
+    return {
+      label: `Request #${request.id} - ${request.property_type} - ${formattedDate}`,
+      value: request.id
+    };
+  });
 });
 
 // Button click handler changes based on state
@@ -405,10 +420,72 @@ const handleRouteCalculated = (routeInfo) => {
     const hours = Math.floor(durationInMinutes / 60);
     const minutes = durationInMinutes % 60;
     travelTime.value = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-    
+
     // Update distance
     const distanceInKm = (routeInfo.distance / 1000).toFixed(1);
     routeDistance.value = `${distanceInKm} km`;
+  }
+};
+
+// Handle request selection change
+const handleRequestChange = async (requestId: number) => {
+  if (!requestId || requestId === requestsStore.selectedRequest?.id) return;
+
+  loading.value = true;
+  error.value = '';
+
+  try {
+    // Load the selected request
+    const request = await requestsStore.getRequestById(requestId);
+
+    if (!request || !requestsStore.selectedRequest) {
+      error.value = `Failed to load request #${requestId}`;
+      loading.value = false;
+      return;
+    }
+
+    // Update URL with new request ID
+    router.replace({
+      path: '/tracking',
+      query: { id: requestId.toString() }
+    });
+
+    // Update selected request ID
+    selectedRequestId.value = requestId;
+
+    // Update status flags
+    const status = requestsStore.selectedRequest.status || 'pending';
+
+    if (status === 'confirmed') {
+      isMoving.value = false;
+      onBreak.value = false;
+    } else if (status === 'active') {
+      isMoving.value = true;
+      onBreak.value = false;
+    } else if (status === 'break') {
+      isMoving.value = true;
+      onBreak.value = true;
+    }
+
+    // Update map center
+    if (requestsStore.selectedRequest.addresses?.length > 0) {
+      const firstAddr = requestsStore.selectedRequest.addresses[0];
+      const lat = parseFloat(firstAddr.latitude);
+      const lng = parseFloat(firstAddr.longitude);
+
+      if (!isNaN(lat) && !isNaN(lng)) {
+        mapCenter.value = { lat, lng };
+      }
+    }
+
+    // Update number of movers
+    numberOfMovers.value = requestsStore.selectedRequest.movers_count || 2;
+
+  } catch (err) {
+    console.error('Error changing request:', err);
+    error.value = 'Failed to load selected request';
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -417,11 +494,16 @@ onMounted(async () => {
     router.push('/')
     return
   }
-  
+
   loading.value = true
   error.value = ''
-  
+
   try {
+    // Fetch all user requests for the selector
+    await requestsStore.fetchRequests();
+    userRequests.value = requestsStore.requests || [];
+    console.log('Loaded user requests:', userRequests.value.length);
+
     // Get request ID from either URL query parameter or store
     let requestId = Number(router.currentRoute.value.query.id)
     console.log('TrackingView mounted with query ID:', requestId)
@@ -498,6 +580,9 @@ onMounted(async () => {
     // Set number of movers
     numberOfMovers.value = requestsStore.selectedRequest.movers_count || 2
     console.log(`Number of movers: ${numberOfMovers.value}`)
+
+    // Set selected request ID for the selector
+    selectedRequestId.value = requestsStore.selectedRequest.id
   } catch (err) {
     console.error('Init tracking error:', err)
     error.value = 'An error occurred while loading the request'
@@ -571,6 +656,18 @@ onUnmounted(() => {
     </main>
     
     <main v-else class="tracking-content">
+      <!-- Request Selector -->
+      <div class="request-selector-container">
+        <n-select
+          v-model:value="selectedRequestId"
+          :options="requestOptions"
+          placeholder="Select a request"
+          @update:value="handleRequestChange"
+          :disabled="loading"
+          class="request-selector"
+        />
+      </div>
+
       <!-- Map Container with overlays -->
       <div class="map-wrapper">
         <!-- Map -->
@@ -749,6 +846,18 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+.request-selector-container {
+  background: var(--color-background);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  z-index: 20;
+}
+
+.request-selector {
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .map-wrapper {
@@ -959,24 +1068,32 @@ onUnmounted(() => {
 
 /* Responsive */
 @media (max-width: 640px) {
+  .request-selector-container {
+    padding: 8px 12px;
+  }
+
+  .request-selector {
+    max-width: 100%;
+  }
+
   .info-cards {
     top: 12px;
     left: 12px;
     right: 12px;
   }
-  
+
   .info-card {
     padding: 10px 14px;
   }
-  
+
   .info-value {
     font-size: 16px;
   }
-  
+
   .overlay-content {
     padding: 0 12px 12px;
   }
-  
+
   .content-block {
     padding: 12px;
   }

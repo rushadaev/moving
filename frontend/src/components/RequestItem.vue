@@ -57,6 +57,63 @@
           {{ item.unloadingAddress }}
         </div>
       </div>
+
+      <!-- Tips and Review Section (for completed requests) -->
+      <div v-if="item.status === 'completed' && item.fullRequest" class="w-full pt-3 border-t border-gray-700" @click.stop>
+        <!-- Tips Section -->
+        <div v-if="!item.fullRequest.tips_amount" class="mb-2">
+          <button
+            @click.stop="$emit('open-tips', item.fullRequest)"
+            class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors text-sm"
+          >
+            + Add Tips
+          </button>
+        </div>
+        <div v-else class="mb-2 bg-gray-800 rounded-lg p-2">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-gray-400 text-xs">Tips:</span>
+              <span class="text-green-400 text-sm font-bold ml-2">
+                ${{ item.fullRequest.tips_amount }}
+              </span>
+              <span class="text-gray-400 text-xs ml-1">
+                ({{ item.fullRequest.tips_percentage }}%)
+              </span>
+            </div>
+            <button
+              @click.stop="$emit('open-tips', item.fullRequest)"
+              class="text-blue-400 hover:text-blue-300 text-xs font-medium"
+            >
+              Edit
+            </button>
+          </div>
+        </div>
+
+        <!-- Review Section -->
+        <div v-if="!item.fullRequest.review">
+          <button
+            @click.stop="$emit('open-review', item.fullRequest)"
+            class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors text-sm"
+          >
+            Leave a Review
+          </button>
+        </div>
+        <div v-else class="bg-gray-800 rounded-lg p-2">
+          <div class="flex items-center">
+            <span class="text-gray-400 text-xs mr-2">Your Review:</span>
+            <div class="flex">
+              <span
+                v-for="star in 5"
+                :key="star"
+                class="text-sm"
+                :class="star <= item.fullRequest.review.rating ? 'text-yellow-400' : 'text-gray-600'"
+              >
+                ★
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -69,10 +126,17 @@ interface RequestItem {
   time: string;
   loadingAddress: string;
   unloadingAddress: string;
+  status?: string;
+  fullRequest?: any;
 }
 
 defineProps<{
   item: RequestItem
+}>()
+
+defineEmits<{
+  'open-tips': [request: any]
+  'open-review': [request: any]
 }>()
 </script>
 

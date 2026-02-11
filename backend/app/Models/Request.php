@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Request extends Model
@@ -26,16 +27,26 @@ class Request extends Model
         'status',
         'payment_status',
         'stripe_session_id',
+        'tips_amount',
+        'tips_percentage',
+        'tips_distribution',
+        'tips_payment_status',
+        'tips_stripe_session_id',
+        'completed_at',
         'user_id',
         'operator_id'
     ];
 
     protected $casts = [
         'departure_time' => 'datetime',
+        'completed_at' => 'datetime',
         'price' => 'decimal:2',
+        'tips_amount' => 'decimal:2',
+        'tips_percentage' => 'decimal:2',
         'square_feet' => 'decimal:2',
         'hourly_rate' => 'decimal:2',
         'additional_objects' => 'array',
+        'tips_distribution' => 'array',
         'labor_included' => 'boolean',
     ];
 
@@ -57,6 +68,11 @@ class Request extends Model
     public function materials(): HasMany
     {
         return $this->hasMany(Material::class);
+    }
+
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class);
     }
 
     public function getLoadingAddressAttribute()

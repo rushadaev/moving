@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\RequestController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PackingMaterialController;
+use App\Http\Controllers\Api\V1\TipsController;
+use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\LandingPageController;
 
 /*
@@ -52,6 +54,18 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/payments/create-intent', [PaymentController::class, 'createPaymentIntent']);
     Route::post('/payments/confirm', [PaymentController::class, 'confirmPayment']);
     Route::get('/payments/status/{paymentIntentId}', [PaymentController::class, 'getPaymentStatus']);
+
+    // Tips routes
+    Route::post('/tips/calculate', [TipsController::class, 'calculate']);
+    Route::post('/tips/store', [TipsController::class, 'store']);
+    Route::post('/tips/create-payment', [TipsController::class, 'createPaymentIntent']);
+    Route::post('/tips/confirm-payment', [TipsController::class, 'confirmPayment']);
+
+    // Review routes
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::get('/reviews/{requestId}', [ReviewController::class, 'show']);
+    Route::put('/reviews/{id}', [ReviewController::class, 'update']);
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 });
 
 // Health check endpoint

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import RequestItem from './RequestItem.vue'
 import CreateRequestModal from './modals/CreateRequestModal.vue'
+import TipsModal from './modals/TipsModal.vue'
+import ReviewModal from './modals/ReviewModal.vue'
 import GradientButton from './ui/GradientButton.vue'
 import { useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
@@ -17,6 +19,9 @@ const requestsStore = useRequestsStore()
 const authStore = useAuthStore()
 const loading = ref(false)
 const showCreateModal = ref(false)
+const showTipsModal = ref(false)
+const showReviewModal = ref(false)
+const selectedRequest = ref<Request | null>(null)
 
 const formattedRequests = computed(() => {
   return props.requests.map(request => {
@@ -78,6 +83,30 @@ const onRequestCreated = () => {
   // Just close the modal which is handled by the modal component
   showCreateModal.value = false
 }
+
+// Handle opening tips modal
+const openTipsModal = (request: Request) => {
+  selectedRequest.value = request
+  showTipsModal.value = true
+}
+
+// Handle opening review modal
+const openReviewModal = (request: Request) => {
+  selectedRequest.value = request
+  showReviewModal.value = true
+}
+
+// Handle tips paid
+const onTipsPaid = async () => {
+  await requestsStore.fetchRequests()
+  showTipsModal.value = false
+  showReviewModal.value = true // Show review modal after tips
+}
+
+// Handle review submitted
+const onReviewSubmitted = async () => {
+  await requestsStore.fetchRequests()
+}
 </script>
 
 <template>
@@ -108,15 +137,17 @@ const onRequestCreated = () => {
     </div>
     
     <div v-else class="requests-grid">
-      <div 
-        v-for="item in formattedRequests" 
+      <div
+        v-for="item in formattedRequests"
         :key="item.id"
         @click="showRequestDetails(item)"
         class="request-item-wrapper"
       >
-        <RequestItem 
+        <RequestItem
           :item="item"
           :disabled="loading"
+          @open-tips="openTipsModal"
+          @open-review="openReviewModal"
         />
       </div>
     </div>
@@ -125,6 +156,22 @@ const onRequestCreated = () => {
     <CreateRequestModal
       v-model:show="showCreateModal"
       @created="onRequestCreated"
+    />
+
+    <!-- Tips Modal -->
+    <TipsModal
+      v-if="selectedRequest"
+      v-model:show="showTipsModal"
+      :request="selectedRequest"
+      @tips-paid="onTipsPaid"
+    />
+
+    <!-- Review Modal -->
+    <ReviewModal
+      v-if="selectedRequest"
+      v-model:show="showReviewModal"
+      :request="selectedRequest"
+      @review-submitted="onReviewSubmitted"
     />
   </div>
 </template>

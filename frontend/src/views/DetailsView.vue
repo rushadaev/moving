@@ -200,6 +200,33 @@ const goToTracking = () => {
 const cancelEdit = () => {
   router.push('/requests')
 }
+
+// Financial Summary Helpers
+const getPaymentStatusClass = (status: string) => {
+  const statusMap = {
+    'pending': 'status-pending',
+    'paid': 'status-paid',
+    'processing': 'status-processing',
+    'failed': 'status-failed'
+  }
+  return statusMap[status] || 'status-pending'
+}
+
+const getPaymentStatusText = (status: string) => {
+  const textMap = {
+    'pending': 'Pending',
+    'paid': 'Paid',
+    'processing': 'Processing',
+    'failed': 'Failed'
+  }
+  return textMap[status] || 'Pending'
+}
+
+const calculateTotal = () => {
+  const basePrice = Number(requestsStore.selectedRequest?.price || 0)
+  const tipsAmount = Number(requestsStore.selectedRequest?.tips_amount || 0)
+  return (basePrice + tipsAmount).toFixed(2)
+}
 </script>
 
 <template>
@@ -220,6 +247,53 @@ const cancelEdit = () => {
       </div>
       
       <div v-else class="form-container">
+        <!-- Financial Summary Card -->
+        <n-card v-if="isEditing && requestsStore.selectedRequest" class="financial-summary-card">
+          <h2 class="summary-title">Financial Summary</h2>
+
+          <div class="summary-grid">
+            <!-- Base Price -->
+            <div class="summary-row">
+              <span class="summary-label">Base Price:</span>
+              <span class="summary-value price-value">${{ requestsStore.selectedRequest.price || 0 }}</span>
+            </div>
+
+            <!-- Payment Status -->
+            <div class="summary-row">
+              <span class="summary-label">Payment Status:</span>
+              <span class="summary-badge" :class="getPaymentStatusClass(requestsStore.selectedRequest.payment_status)">
+                {{ getPaymentStatusText(requestsStore.selectedRequest.payment_status) }}
+              </span>
+            </div>
+
+            <!-- Tips Amount (if added) -->
+            <div v-if="requestsStore.selectedRequest.tips_amount" class="summary-row">
+              <span class="summary-label">Tips:</span>
+              <span class="summary-value tips-value">
+                ${{ requestsStore.selectedRequest.tips_amount }}
+                <span class="tips-percentage">({{ requestsStore.selectedRequest.tips_percentage }}%)</span>
+              </span>
+            </div>
+
+            <!-- Tips Payment Status (if tips added) -->
+            <div v-if="requestsStore.selectedRequest.tips_amount" class="summary-row">
+              <span class="summary-label">Tips Payment:</span>
+              <span class="summary-badge" :class="getPaymentStatusClass(requestsStore.selectedRequest.tips_payment_status)">
+                {{ getPaymentStatusText(requestsStore.selectedRequest.tips_payment_status) }}
+              </span>
+            </div>
+
+            <!-- Total -->
+            <div class="summary-row total-row">
+              <span class="summary-label">Total:</span>
+              <span class="summary-value total-value">
+                ${{ calculateTotal() }}
+              </span>
+            </div>
+          </div>
+        </n-card>
+
+        <!-- Request Form Card -->
         <n-card>
           <RequestForm
             ref="requestFormRef"
@@ -227,7 +301,7 @@ const cancelEdit = () => {
             mode="edit"
             :loading="saving"
           />
-          
+
           <!-- Action Buttons -->
           <div class="action-buttons">
             <GradientButton @click="cancelEdit" :disabled="saving">
@@ -236,7 +310,7 @@ const cancelEdit = () => {
             <GradientButton @click="saveRequest" :disabled="saving">
               {{ saving ? 'Saving...' : 'Save Changes' }}
             </GradientButton>
-            <GradientButton 
+            <GradientButton
               v-if="isEditing && requestsStore.selectedRequest?.id"
               @click="goToTracking"
               :disabled="saving"
@@ -285,6 +359,102 @@ const cancelEdit = () => {
 
 .form-container {
   width: 100%;
+}
+
+.financial-summary-card {
+  margin-bottom: 20px;
+}
+
+.summary-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 20px 0;
+}
+
+.summary-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.summary-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.price-value {
+  color: #3b82f6;
+}
+
+.tips-value {
+  color: #10b981;
+}
+
+.tips-percentage {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-left: 8px;
+}
+
+.total-row {
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 2px solid var(--color-border);
+  border-bottom: none;
+}
+
+.total-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #059669;
+}
+
+.summary-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background-color: rgba(251, 191, 36, 0.1);
+  color: #f59e0b;
+}
+
+.status-paid {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.status-processing {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.status-failed {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 }
 
 .action-buttons {
