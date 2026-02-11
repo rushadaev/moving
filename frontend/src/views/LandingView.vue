@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen mt-[-60px] flex flex-col items-center bg-[#144560]">
+  <div class="min-h-screen mt-[-60px] flex flex-col items-center bg-[#144560] px-4 sm:px-6 md:px-8 lg:px-12">
     <!-- Loading state -->
     <div v-if="loading" class="flex items-center justify-center min-h-screen">
       <div class="text-white text-xl">Loading...</div>
