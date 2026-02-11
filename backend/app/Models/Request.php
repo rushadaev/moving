@@ -24,6 +24,8 @@ class Request extends Model
         'package_type',
         'price',
         'status',
+        'payment_status',
+        'stripe_session_id',
         'user_id',
         'operator_id'
     ];

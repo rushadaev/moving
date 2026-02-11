@@ -167,7 +167,7 @@
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
         @click.self="showLeaveRequestModal = false"
       >
-        <div class="bg-[#1e293b] rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="bg-[#1e293b] rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto flex flex-col">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-white">Leave a Request</h2>
             <button
@@ -178,20 +178,49 @@
             </button>
           </div>
 
-          <RequestForm
-            v-if="authStore.isAuthenticated"
-            ref="requestFormRef"
-            v-model="requestFormData"
-            mode="create"
-          />
-          <div v-else class="text-white text-center py-8">
-            <p class="mb-4">Please login to leave a request</p>
-            <button
-              @click="router.push('/auth')"
-              class="btn bg-blue-600 text-white hover:bg-blue-700"
-            >
-              Login
-            </button>
+          <div class="flex-1 overflow-y-auto">
+            <RequestForm
+              v-if="authStore.isAuthenticated"
+              ref="requestFormRef"
+              v-model="requestFormData"
+              mode="create"
+            />
+            <div v-else class="text-white text-center py-8">
+              <p class="mb-4">Please login to leave a request</p>
+              <button
+                @click="router.push('/auth')"
+                class="btn bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Login
+              </button>
+            </div>
+          </div>
+
+          <!-- Modal Footer with Payment -->
+          <div v-if="authStore.isAuthenticated" class="mt-6 pt-4 border-t border-gray-600">
+            <div class="flex justify-between items-center mb-4">
+              <div class="text-white">
+                <p class="text-sm text-gray-400">Estimated Total:</p>
+                <p class="text-2xl font-bold">${{ estimatedTotal.toFixed(2) }}</p>
+              </div>
+              <div class="flex gap-3">
+                <button
+                  @click="showLeaveRequestModal = false"
+                  class="px-6 py-2 rounded-lg border border-gray-500 text-white hover:bg-gray-700 transition-colors"
+                  :disabled="bookingLoading"
+                >
+                  Cancel
+                </button>
+                <button
+                  @click="handleBookAndPay"
+                  class="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-semibold"
+                  :disabled="bookingLoading"
+                >
+                  {{ bookingLoading ? 'Processing...' : 'Book & Pay with Stripe' }}
+                </button>
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 text-center">You'll be redirected to Stripe for secure payment</p>
           </div>
         </div>
       </div>
@@ -278,7 +307,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import logoIcon from '@/assets/icons/Logo.svg'
 import instagramIcon from '@/assets/icons/Instagram.svg'
 import facebookIcon from '@/assets/icons/Facebook.svg'
@@ -287,10 +316,16 @@ import mailIcon from '@/assets/icons/Mail.svg'
 import phoneIcon from '@/assets/icons/Phone.svg'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useMessage } from 'naive-ui'
 import RequestForm from '@/components/forms/RequestForm.vue'
+import geocodingService from '@/services/geocoding.service'
+import routesService from '@/services/routes.service'
+import { loadStripe } from '@stripe/stripe-js'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const message = useMessage()
+const bookingLoading = ref(false)
 
 // Reactive state for landing page data
 const settings = ref(null)
@@ -417,6 +452,159 @@ function handleBookMoving(service) {
   } catch (error) {
     console.error('Error in handleBookMoving:', error)
     window.location.href = authStore.isAuthenticated ? '/requests' : '/auth'
+  }
+}
+
+// Calculate estimated total
+const estimatedTotal = computed(() => {
+  let total = 0
+
+  // Hourly rate for estimated 3 hours
+  const estimatedHours = 3
+  total += (requestFormData.value.hourly_rate || 100) * estimatedHours
+
+  // Travel cost ($2 per mile, estimate 20 miles)
+  const estimatedMiles = 20
+  total += estimatedMiles * 2
+
+  // Materials cost
+  const materialPrices = {
+    full_service_packing: 200,
+    boxes: 5,
+    bubble_wrap: 10,
+    packing_tape: 3
+  }
+
+  if (requestFormData.value.materials && Array.isArray(requestFormData.value.materials)) {
+    requestFormData.value.materials.forEach(material => {
+      const price = materialPrices[material.name] || 0
+      total += price * (material.quantity || 1)
+    })
+  }
+
+  return total
+})
+
+// Handle Book & Pay with Stripe
+async function handleBookAndPay() {
+  // Validate form
+  if (!requestFormRef.value) {
+    message.error('Form not ready')
+    return
+  }
+
+  const validation = requestFormRef.value.validate()
+  if (!validation.valid) {
+    message.error(validation.message)
+    return
+  }
+
+  bookingLoading.value = true
+
+  try {
+    // 1. Geocode addresses
+    const pickupAddress = requestFormData.value.addresses[0]
+    const deliveryAddress = requestFormData.value.addresses[1]
+
+    if (!pickupAddress.latitude || !pickupAddress.longitude) {
+      message.info('Geocoding pickup address...')
+      const pickupGeocode = await geocodingService.geocodeAddress(pickupAddress.address)
+      if (pickupGeocode) {
+        requestFormData.value.addresses[0].latitude = pickupGeocode.latitude
+        requestFormData.value.addresses[0].longitude = pickupGeocode.longitude
+        requestFormData.value.addresses[0].address = pickupGeocode.formattedAddress
+      } else {
+        message.error('Could not find pickup location')
+        bookingLoading.value = false
+        return
+      }
+    }
+
+    if (!deliveryAddress.latitude || !deliveryAddress.longitude) {
+      message.info('Geocoding delivery address...')
+      const deliveryGeocode = await geocodingService.geocodeAddress(deliveryAddress.address)
+      if (deliveryGeocode) {
+        requestFormData.value.addresses[1].latitude = deliveryGeocode.latitude
+        requestFormData.value.addresses[1].longitude = deliveryGeocode.longitude
+        requestFormData.value.addresses[1].address = deliveryGeocode.formattedAddress
+      } else {
+        message.error('Could not find delivery location')
+        bookingLoading.value = false
+        return
+      }
+    }
+
+    // 2. Calculate actual distance
+    message.info('Calculating distance...')
+    const routeInfo = await routesService.calculateRoute(
+      { lat: requestFormData.value.addresses[0].latitude, lng: requestFormData.value.addresses[0].longitude },
+      { lat: requestFormData.value.addresses[1].latitude, lng: requestFormData.value.addresses[1].longitude }
+    )
+
+    let distanceMiles = 0
+    if (routeInfo) {
+      distanceMiles = Math.round((routeInfo.distance / 1609.34) * 10) / 10
+    }
+
+    // 3. Create request in backend
+    message.info('Creating moving request...')
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:80/api'
+    const token = localStorage.getItem('token') || authStore.token
+
+    const requestResponse = await fetch(`${apiUrl}/v1/requests`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ...requestFormData.value,
+        distance: distanceMiles,
+        price: estimatedTotal.value
+      })
+    })
+
+    if (!requestResponse.ok) {
+      const error = await requestResponse.json()
+      throw new Error(error.message || 'Failed to create request')
+    }
+
+    const request = await requestResponse.json()
+
+    // 4. Create Stripe Checkout Session
+    message.info('Redirecting to payment...')
+    const paymentResponse = await fetch(`${apiUrl}/v1/payments/create-intent`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        amount: estimatedTotal.value,
+        currency: 'usd',
+        request_id: request.id
+      })
+    })
+
+    if (!paymentResponse.ok) {
+      throw new Error('Failed to create payment session')
+    }
+
+    const paymentData = await paymentResponse.json()
+
+    // 5. Redirect to Stripe Checkout
+    const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
+    if (paymentData.redirectUrl) {
+      window.location.href = paymentData.redirectUrl
+    } else {
+      throw new Error('No redirect URL received')
+    }
+
+  } catch (error) {
+    console.error('Booking error:', error)
+    message.error(error.message || 'Failed to process booking')
+  } finally {
+    bookingLoading.value = false
   }
 }
 

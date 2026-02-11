@@ -129,7 +129,10 @@ class PackingMaterialSeeder extends Seeder
         ];
 
         foreach ($materials as $material) {
-            PackingMaterial::create($material);
+            PackingMaterial::updateOrCreate(
+                ['name' => $material['name']],
+                $material
+            );
         }
 
         $this->command->info('Packing materials seeded successfully!');

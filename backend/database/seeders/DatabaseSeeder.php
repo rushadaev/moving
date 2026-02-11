@@ -20,12 +20,19 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
         ]);
 
-        // Create test admin user
-        $user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-        $user->assignRole('admin');
+        // Create test admin user (only if doesn't exist)
+        $user = User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => bcrypt('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        if (!$user->hasRole('admin')) {
+            $user->assignRole('admin');
+        }
 
         // Seed other data
         $this->call([
