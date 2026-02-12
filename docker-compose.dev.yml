@@ -21,9 +21,12 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - ./frontend/.env:/app/.env
     environment:
       - NODE_ENV=development
+      - VITE_APP_NAME=${VITE_APP_NAME}
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
+      - VITE_STRIPE_PUBLIC_KEY=${STRIPE_KEY}
     networks:
       - app-network
 

@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import { NConfigProvider, NMessageProvider, darkTheme, type GlobalThemeOverrides } from 'naive-ui'
 import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
+
+const route = useRoute()
+const isLandingPage = computed(() => route.path === '/')
 
 // Check if user prefers dark mode
 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -334,10 +337,10 @@ const themeOverrides = computed(() => prefersDark ? darkThemeOverrides : lightTh
 <template>
   <n-config-provider :theme="theme" :theme-overrides="themeOverrides">
     <n-message-provider>
-      <div class="main-content">
+      <div :class="isLandingPage ? 'landing-content' : 'main-content'">
         <RouterView />
       </div>
-      <Footer/>
+      <Footer v-if="!isLandingPage" />
     </n-message-provider>
   </n-config-provider>
 </template>
@@ -348,5 +351,11 @@ const themeOverrides = computed(() => prefersDark ? darkThemeOverrides : lightTh
   padding-bottom: 70px; /* Height of footer */
   min-height: 100vh;
   background: var(--color-background);
+}
+
+.landing-content {
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
 }
 </style>
