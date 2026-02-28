@@ -27,8 +27,6 @@
           alt="Modern interior"
           class="w-full h-full object-cover"
         />
-        <!-- Dark overlay for better text readability -->
-        <div class="absolute inset-0 bg-black/30"></div>
       </div>
 
       <!-- Hero Content -->
@@ -67,77 +65,79 @@
     </section>
 
     <!-- Feature Section - Residential -->
-    <section id="residential" class="py-24 w-full">
-      <div class="w-full px-8 lg:px-16">
-        <div class="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <div class="text-sm font-semibold text-orange-600 mb-2">RESIDENTIAL</div>
-            <h2 class="text-4xl md:text-5xl font-semibold mb-6 tracking-tight text-black">
-              Your home.<br />Our priority.
-            </h2>
-            <p class="text-xl text-black leading-relaxed mb-8">
-              From packing your first box to placing the last piece of furniture,
-              our team handles every detail with care. Because your belongings aren't just things—they're your life.
-            </p>
-            <div class="space-y-3 text-lg text-black">
-              <div class="flex items-center gap-3">
-                <div class="w-1 h-1 bg-black rounded-full"></div>
-                <span>Full-service packing</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-1 h-1 bg-black rounded-full"></div>
-                <span>Climate-controlled transport</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-1 h-1 bg-black rounded-full"></div>
-                <span>White-glove service</span>
-              </div>
+    <section id="residential" class="relative w-full min-h-screen py-24">
+      <!-- Background Image -->
+      <div class="absolute inset-0 w-full h-full">
+        <img
+          src="https://images.unsplash.com/photo-1606932250069-62f395a08602?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYXBweSUyMGZhbWlseSUyMG5ldyUyMGhvbWV8ZW58MXx8fHwxNzcwODcxOTgzfDA&ixlib=rb-4.1.0&q=80&w=1920"
+          alt="Happy family"
+          class="w-full h-full object-cover"
+        />
+      </div>
+
+      <!-- Content -->
+      <div class="relative z-10 w-full px-8 lg:px-16 flex items-center min-h-screen">
+        <div class="max-w-2xl">
+          <div class="text-sm font-semibold text-orange-600 mb-2 uppercase tracking-wider">RESIDENTIAL</div>
+          <h2 class="text-5xl md:text-6xl font-bold mb-8 tracking-tight text-black">
+            Your home.<br />Our priority.
+          </h2>
+          <p class="text-2xl text-black leading-relaxed mb-10">
+            From packing your first box to placing the last piece of furniture,
+            our team handles every detail with care. Because your belongings aren't just things—they're your life.
+          </p>
+          <div class="space-y-4 text-xl text-black">
+            <div class="flex items-center gap-4">
+              <div class="w-2 h-2 bg-black rounded-full"></div>
+              <span class="font-medium">Full-service packing</span>
             </div>
-          </div>
-          <div class="aspect-square rounded-2xl overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1606932250069-62f395a08602?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYXBweSUyMGZhbWlseSUyMG5ldyUyMGhvbWV8ZW58MXx8fHwxNzcwODcxOTgzfDA&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Happy family"
-              class="w-full h-full object-cover"
-            />
+            <div class="flex items-center gap-4">
+              <div class="w-2 h-2 bg-black rounded-full"></div>
+              <span class="font-medium">Climate-controlled transport</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-2 h-2 bg-black rounded-full"></div>
+              <span class="font-medium">White-glove service</span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Feature Section - Commercial -->
-    <section id="commercial" class="py-24 bg-gray-50 w-full">
-      <div class="w-full px-8 lg:px-16">
-        <div class="grid md:grid-cols-2 gap-12 items-center">
-          <div class="order-2 md:order-1 aspect-square rounded-2xl overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1718066236079-9085195c389e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBlbXB0eSUyMGJyaWdodHxlbnwxfHx8fDE3NzA4NzE5ODN8MA&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Modern office"
-              class="w-full h-full object-cover"
-            />
-          </div>
-          <div class="order-1 md:order-2">
-            <div class="text-sm font-semibold text-blue-600 mb-2">COMMERCIAL</div>
-            <h2 class="text-4xl md:text-5xl font-semibold mb-6 tracking-tight text-black">
-              Business moves.<br />Zero downtime.
-            </h2>
-            <p class="text-xl text-black leading-relaxed mb-8">
-              We coordinate every aspect of your office relocation. Your team can focus on what matters
-              while we handle the logistics.
-            </p>
-            <div class="space-y-3 text-lg text-black">
-              <div class="flex items-center gap-3">
-                <div class="w-1 h-1 bg-black rounded-full"></div>
-                <span>After-hours moving</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-1 h-1 bg-black rounded-full"></div>
-                <span>IT equipment specialists</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-1 h-1 bg-black rounded-full"></div>
-                <span>Project management</span>
-              </div>
+    <section id="commercial" class="relative w-full min-h-screen py-24">
+      <!-- Background Image -->
+      <div class="absolute inset-0 w-full h-full">
+        <img
+          src="https://images.unsplash.com/photo-1718066236079-9085195c389e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBlbXB0eSUyMGJyaWdodHxlbnwxfHx8fDE3NzA4NzE5ODN8MA&ixlib=rb-4.1.0&q=80&w=1920"
+          alt="Modern office"
+          class="w-full h-full object-cover"
+        />
+      </div>
+
+      <!-- Content -->
+      <div class="relative z-10 w-full px-8 lg:px-16 flex items-center justify-end min-h-screen">
+        <div class="max-w-2xl">
+          <div class="text-sm font-semibold text-blue-600 mb-2 uppercase tracking-wider">COMMERCIAL</div>
+          <h2 class="text-5xl md:text-6xl font-bold mb-8 tracking-tight text-black">
+            Business moves.<br />Zero downtime.
+          </h2>
+          <p class="text-2xl text-black leading-relaxed mb-10">
+            We coordinate every aspect of your office relocation. Your team can focus on what matters
+            while we handle the logistics.
+          </p>
+          <div class="space-y-4 text-xl text-black">
+            <div class="flex items-center gap-4">
+              <div class="w-2 h-2 bg-black rounded-full"></div>
+              <span class="font-medium">After-hours moving</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-2 h-2 bg-black rounded-full"></div>
+              <span class="font-medium">IT equipment specialists</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-2 h-2 bg-black rounded-full"></div>
+              <span class="font-medium">Project management</span>
             </div>
           </div>
         </div>

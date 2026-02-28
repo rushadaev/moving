@@ -110,13 +110,14 @@ async function handleRegister() {
     <Header :title="isLogin ? 'Login' : 'Register'" />
     
     <main class="p-5 pb-24">
-      <!-- Error Message -->
-      <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        <p>{{ errorMessage }}</p>
-      </div>
-      
-      <!-- Login Form -->
-      <form v-if="isLogin" @submit.prevent="handleLogin" class="space-y-4">
+      <div class="auth-container">
+        <!-- Error Message -->
+        <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <p>{{ errorMessage }}</p>
+        </div>
+
+        <!-- Login Form -->
+        <form v-if="isLogin" @submit.prevent="handleLogin" class="space-y-4">
         <div>
           <label class="block text-sm font-medium mb-1 text-gray-700">Email</label>
           <input 
@@ -244,6 +245,7 @@ async function handleRegister() {
           </p>
         </div>
       </form>
+      </div>
     </main>
     
     <Footer />
@@ -255,5 +257,10 @@ async function handleRegister() {
   min-height: 100vh;
   padding-top: 55px; /* Height of the header */
   background-color: var(--color-background-soft);
+}
+
+.auth-container {
+  max-width: 400px;
+  margin: 0 auto;
 }
 </style> 
